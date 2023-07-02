@@ -1,4 +1,4 @@
-namespace KAEDEHARA_COMPILER.CodeAnalysis
+namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
 {
     sealed class BinaryExpressionSyntax : ExpressionSyntax
         {
@@ -18,7 +18,10 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis
                 yield return Operatortoken ; 
                 yield return Right ;
             }
+            
         }
+
+
 
 
 

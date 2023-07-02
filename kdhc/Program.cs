@@ -1,11 +1,14 @@
 ﻿using KAEDEHARA_COMPILER.CodeAnalysis;
+using KAEDEHARA_COMPILER.CodeAnalysis.Binding;
+using KAEDEHARA_COMPILER.CodeAnalysis.Syntax;
+
 namespace KAEDEHARA_COMPILER
 {
-    class Program
+    internal static class Program
     {
-        static void Main(string[] args)
+       private static void Main()
         {
-            bool ShowTree = false;
+            var ShowTree = false;
             while (true)
             {
                 Console.Write(">");
@@ -27,30 +30,32 @@ namespace KAEDEHARA_COMPILER
                 }
                 // var parser = new Parser(line);
                 var syntaxTree = SyntaxTree.Parse(line);
+                var binder = new Binder();
+                var boundExpression = binder.BindExpression(syntaxTree.Root);
+                var diagnostics = syntaxTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
                 if (ShowTree)
                 {
                     var color = Console.ForegroundColor;
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     PrettyPrint(syntaxTree.Root);
-                    Console.ForegroundColor = color;
+                    Console.ResetColor();
                 }
 
-                if (syntaxTree.Diagnostics.Any())
+                if (!diagnostics.Any())
                 {
-                    var color = Console.ForegroundColor;
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    foreach (var diag in syntaxTree.Diagnostics)
-                    {
-                        Console.WriteLine(diag);
-                    }
-                    Console.ForegroundColor = color;
+                    var e = new Evaluator(boundExpression);
+                    var result = e.Evaluate();
+                    Console.WriteLine(result);
 
                 }
                 else
                 {
-                    var e = new Evaluator(syntaxTree.Root);
-                    var result = e.Evaluate();
-                    Console.WriteLine(result);
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    foreach (var diag in diagnostics)
+                    {
+                        Console.WriteLine(diag);
+                    }
+                    Console.ResetColor();
                 }
             }
         }
