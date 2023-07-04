@@ -11,7 +11,7 @@ internal sealed partial class BoundBinaryExpression : BoundExpression
     public BoundBinaryOperator Op { get; }
     public BoundExpression Right { get; }
     public BoundExpression Left { get; }
-    public override BoundNodeKind Kind => BoundNodeKind.UnaryExpression;
+    public override BoundNodeKind Kind => BoundNodeKind.BinaryExpression;
     public override Type type => Op.Type;
 }
 

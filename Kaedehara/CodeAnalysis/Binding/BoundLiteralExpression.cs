@@ -1,6 +1,6 @@
 using KAEDEHARA_COMPILER.CodeAnalysis.Binding;
 
-namespace kdhc.CodeAnalysis.Binding
+namespace KAEDEHARA_COMPILER.CodeAnalysis.Binding
 {
    internal sealed class BoundLiteralExpression : BoundExpression
     {

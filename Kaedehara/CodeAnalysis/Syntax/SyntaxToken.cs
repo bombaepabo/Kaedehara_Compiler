@@ -11,6 +11,7 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
     public int Position {get;}
     public string? Text{get;}
     public Object? Value{get;}
+    public TextSpan span => new TextSpan(Position,Text.Length);
 
             public override IEnumerable<SyntaxNode> GetChildren()
             {

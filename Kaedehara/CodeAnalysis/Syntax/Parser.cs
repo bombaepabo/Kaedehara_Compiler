@@ -4,7 +4,7 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
     {
         private readonly SyntaxToken[] _tokens;
         private int _position;
-        private List<string> _diagnostics = new List<string>();
+        private DiagnosticBag _diagnostics = new DiagnosticBag();
         public Parser(string text)
         {
             var tokens = new List<SyntaxToken>();
@@ -21,6 +21,7 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
             while (token.Kind != SyntaxKind.EndOfFileToken);
             _tokens = tokens.ToArray();
             _diagnostics.AddRange(lexer.Diagonostics);
+
         }
         private SyntaxToken NextToken()
         {
@@ -34,10 +35,10 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
             {
                 return NextToken();
             }
-            _diagnostics.Add($"ERROR : upexpected token <{Current.Kind}>,expected <{kind}>");
+            _diagnostics.ReportUnexpectedToken(Current.span,Current.Kind,kind);
             return new SyntaxToken(kind, Current.Position, null, null);
         }
-        public IEnumerable<string> Diagnostics => _diagnostics;
+        public DiagnosticBag Diagnostics => _diagnostics;
         private SyntaxToken Peek(int offset)
         {
             var index = _position + offset;
@@ -51,7 +52,7 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
         {
             var expression = ParseExpression();
             var endOfFileToken = MatchToken(SyntaxKind.EndOfFileToken);
-            return new SyntaxTree(Diagnostics, expression, endOfFileToken);
+            return new SyntaxTree(_diagnostics, expression, endOfFileToken);
         }
         private SyntaxToken Current => Peek(0);
         private ExpressionSyntax ParseExpression(int parentPrecedence = 0)

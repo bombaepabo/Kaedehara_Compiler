@@ -1,7 +1,4 @@
 using KAEDEHARA_COMPILER.CodeAnalysis.Binding;
-using KAEDEHARA_COMPILER.CodeAnalysis.Syntax;
-using kdhc.CodeAnalysis.Binding;
-
 namespace KAEDEHARA_COMPILER.CodeAnalysis
 {
     internal sealed class Evaluator

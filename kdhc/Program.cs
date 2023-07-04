@@ -1,12 +1,11 @@
-﻿using KAEDEHARA_COMPILER.CodeAnalysis;
+﻿using KAEDEHARA_COMPILER.CodeAnalysis.Syntax;
 using KAEDEHARA_COMPILER.CodeAnalysis.Binding;
-using KAEDEHARA_COMPILER.CodeAnalysis.Syntax;
-
+using KAEDEHARA_COMPILER.CodeAnalysis;
 namespace KAEDEHARA_COMPILER
 {
     internal static class Program
     {
-       private static void Main()
+        private static void Main()
         {
             var ShowTree = false;
             while (true)
@@ -30,9 +29,9 @@ namespace KAEDEHARA_COMPILER
                 }
                 // var parser = new Parser(line);
                 var syntaxTree = SyntaxTree.Parse(line);
-                var binder = new Binder();
-                var boundExpression = binder.BindExpression(syntaxTree.Root);
-                var diagnostics = syntaxTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
+                var compilation = new Compilation(syntaxTree);
+                var result = compilation.Evaluate();
+                var diagnostics = result.Diagnostics;
                 if (ShowTree)
                 {
                     var color = Console.ForegroundColor;
@@ -43,19 +42,32 @@ namespace KAEDEHARA_COMPILER
 
                 if (!diagnostics.Any())
                 {
-                    var e = new Evaluator(boundExpression);
-                    var result = e.Evaluate();
-                    Console.WriteLine(result);
+                    Console.WriteLine(result.Value);
 
                 }
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     foreach (var diag in diagnostics)
                     {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine(diag);
+                        Console.ResetColor();
+                        var prefix = line.Substring(0, diag.Span.Start);
+                        var error = line.Substring(diag.Span.Start, diag.Span.Length);
+                        var suffix = line.Substring(diag.Span.End);
+                        Console.Write("    ");
+                        Console.Write(prefix);
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.Write(error);
+                        Console.ResetColor();
+                        Console.Write(suffix);
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+
                     }
-                    Console.ResetColor();
+                    Console.WriteLine();
+
                 }
             }
         }
@@ -75,7 +87,7 @@ namespace KAEDEHARA_COMPILER
             }
             Console.WriteLine();
 
-            indent += isLast ? "    " : "│   ";
+            indent += isLast ? "    " : "│  ";
             var lastChild = node.GetChildren().LastOrDefault();
             foreach (var child in node.GetChildren())
             {
