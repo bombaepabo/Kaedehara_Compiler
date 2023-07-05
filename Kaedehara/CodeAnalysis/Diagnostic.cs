@@ -63,6 +63,12 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis
             var message = $"Binary operator '{operatorText}' is not defined for type {boundLeft} and {boundRight}." ;
             Report(span,message);
         }
+
+        internal void ReportUndefinedName(TextSpan span, string name)
+        {
+              var message = $"Variables'{name}' doesn't exist." ;
+            Report(span,message);
+        }
     }
 
 

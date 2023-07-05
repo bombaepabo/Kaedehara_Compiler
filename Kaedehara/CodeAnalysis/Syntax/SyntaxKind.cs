@@ -22,8 +22,11 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
         PipeToken,
         AmpersanToken,
         BangToken,
-        EqualToken,
-        NotEqualToken
+        EqualsToken,
+        NotEqualToken,
+        NameExpression,
+        AssignmentExpression,
+        EqualToken
     }
 
 

@@ -1,14 +1,20 @@
 using KAEDEHARA_COMPILER.CodeAnalysis.Binding;
+using System;
+using System.Collections.Generic;
 namespace KAEDEHARA_COMPILER.CodeAnalysis
 {
     internal sealed class Evaluator
     {
+        private readonly Dictionary<VariableSymbol, object> Variables ;
         private readonly BoundExpression _root;
 
-        public Evaluator(BoundExpression root)
+        public Evaluator(BoundExpression root, Dictionary<VariableSymbol, object> variables)
         {
             this._root = root;
+            Variables = variables;
         }
+
+
         public object Evaluate()
         {
             return EvaluateExpression(_root);
@@ -19,6 +25,14 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis
             if (node is BoundLiteralExpression n)
             {
                 return n.Value;
+            }
+            if (node is BoundVariableExpression v){
+                return Variables[v.Variable];;
+            }
+            if(node is BoundAssignmentExpression a){
+                var value = EvaluateExpression(a.Expression);
+                Variables[a.Variable] = value ;
+                return value ;
             }
             if (node is BoundUnaryExpression u){
                 var operand =  EvaluateExpression(u.Operand);
