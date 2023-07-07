@@ -13,7 +13,7 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
                 case SyntaxKind.PlusToken:
                 case SyntaxKind.MinusToken:
                     return 4;
-                case SyntaxKind.EqualsToken:
+                case SyntaxKind.EqualEqualToken:
                 case SyntaxKind.NotEqualToken:
                     return 3;
                 case SyntaxKind.AmpersanToken:

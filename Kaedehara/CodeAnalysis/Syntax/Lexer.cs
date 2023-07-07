@@ -21,7 +21,7 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
             {
                 return '\0';
             }
-            return _text[_position];
+            return _text[index];
         }
 
         private void Next()
@@ -30,12 +30,12 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
         }
         public SyntaxToken Lex()
         {
+            var start = _position;
 
             if (_position >= _text.Length)
             {
                 return new SyntaxToken(SyntaxKind.EndOfFileToken, _position, "\0", null);
             }
-            var start = _position;
             if (char.IsDigit(Current))
             {
                 while (char.IsDigit(Current))
@@ -105,13 +105,14 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
                     if (Lookahead == '=')
                     {
                         _position += 2;
-                        return new SyntaxToken(SyntaxKind.EqualsToken, start, "==", null);
+                        return new SyntaxToken(SyntaxKind.EqualEqualToken, start, "==", null);
                     }
                     else
                     {
                         _position += 1;
-                        return new SyntaxToken(SyntaxKind.EqualToken, start, "=", null);
+                        return new SyntaxToken(SyntaxKind.EqualsToken, start, "=", null);
                     }
+                    break;
                 case '!':
                     if (Lookahead == '=')
                     {
@@ -123,6 +124,8 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
                         _position += 1;
                         return new SyntaxToken(SyntaxKind.BangToken, start, "!", null);
                     }
+                    break;
+
             }
             _diagnostics.ReportBadCharacter(_position, Current);
             return new SyntaxToken(SyntaxKind.BadToken, _position++, _text.Substring(_position - 1, 1), null);

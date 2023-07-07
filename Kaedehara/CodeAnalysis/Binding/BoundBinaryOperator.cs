@@ -37,9 +37,9 @@ internal sealed class BoundBinaryOperator
             new BoundBinaryOperator(SyntaxKind.SlashToken,BoundBinaryOperatorKind.Division,typeof(int)),
             new BoundBinaryOperator(SyntaxKind.AmpersanToken,BoundBinaryOperatorKind.LogicalAnd,typeof(bool)),
             new BoundBinaryOperator(SyntaxKind.PipeToken,BoundBinaryOperatorKind.LogicalOr,typeof(bool)),
-            new BoundBinaryOperator(SyntaxKind.EqualsToken,BoundBinaryOperatorKind.Equals,typeof(int),typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.EqualEqualToken,BoundBinaryOperatorKind.Equals,typeof(int),typeof(bool)),
             new BoundBinaryOperator(SyntaxKind.NotEqualToken,BoundBinaryOperatorKind.NotEquals,typeof(int),typeof(bool)),
-            new BoundBinaryOperator(SyntaxKind.EqualsToken,BoundBinaryOperatorKind.Equals,typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.EqualEqualToken,BoundBinaryOperatorKind.Equals,typeof(bool)),
             new BoundBinaryOperator(SyntaxKind.NotEqualToken,BoundBinaryOperatorKind.NotEquals,typeof(bool)),
 
         };

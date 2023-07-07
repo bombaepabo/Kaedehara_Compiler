@@ -48,6 +48,7 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
             if (index >= _tokens.Length)
             {
                 return _tokens[_tokens.Length - 1];
+
             }
             return _tokens[index];
         }
@@ -64,21 +65,22 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
         }
         private ExpressionSyntax ParseAssignmentExpression()
         {
-            
-            if (Peek(0).Kind == SyntaxKind.IdentifierToken && Peek(1).Kind == SyntaxKind.EqualToken)
+
+            if (Peek(0).Kind == SyntaxKind.IdentifierToken && Peek(1).Kind == SyntaxKind.EqualsToken)
             {
                 var identifierToken = NextToken();
                 var operatorToken = NextToken();
                 var right = ParseAssignmentExpression();
                 return new AssignmentExpressionSyntax(identifierToken, operatorToken, right);
             }
+
             return ParseBinaryExpression();
         }
         private ExpressionSyntax ParseBinaryExpression(int parentPrecedence = 0)
         {
             ExpressionSyntax left;
             var unaryOperatorPrecedence = Current.Kind.GetBinaryOperatorPrecedence();
-            if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence > parentPrecedence)
+            if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
             {
                 var operatorToken = NextToken();
                 var operand = ParseBinaryExpression(unaryOperatorPrecedence);
