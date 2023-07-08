@@ -2,21 +2,6 @@ using Kaedehara.CodeAnalysis.Syntax;
 using KAEDEHARA_COMPILER.CodeAnalysis.Syntax;
 
 namespace KAEDEHARA_COMPILER.CodeAnalysis.Binding;
-internal sealed class BoundAssignmentExpression : BoundExpression
-{
-    public BoundAssignmentExpression(VariableSymbol variable, BoundExpression expression)
-    {
-        Variable = variable;
-        Expression = expression;
-    }
-
-    public override Type type => Expression.type;
-
-    public override BoundNodeKind Kind => BoundNodeKind.AssignmentExpression;
-
-    public VariableSymbol Variable { get; }
-    public BoundExpression Expression { get; }
-}
 internal sealed class Binder
 {
     private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
@@ -34,18 +19,18 @@ internal sealed class Binder
     {
         switch (syntax.Kind)
         {
-            case SyntaxKind.LiteralExpression:
-                return BindLiteralExpression((LiteralExpressionSyntax)syntax);
-            case SyntaxKind.BinaryExpression:
-                return BindBinaryExpression((BinaryExpressionSyntax)syntax);
-            case SyntaxKind.UnaryExpression:
-                return BindUnaryExpression((UnaryExpressionSyntax)syntax);
             case SyntaxKind.ParenthesizedExpression:
                 return BindParenthesizedExpression(((ParenthesizedExpressionSyntax)syntax));
+            case SyntaxKind.LiteralExpression:
+                return BindLiteralExpression((LiteralExpressionSyntax)syntax);
             case SyntaxKind.NameExpression:
                 return BindNameExpression(((NameExpressionSyntax)syntax));
              case SyntaxKind.AssignmentExpression:
                 return BindAssignmentExpression(((AssignmentExpressionSyntax)syntax));
+            case SyntaxKind.UnaryExpression:
+                return BindUnaryExpression((UnaryExpressionSyntax)syntax);
+            case SyntaxKind.BinaryExpression:
+                return BindBinaryExpression((BinaryExpressionSyntax)syntax);
             default:
                 throw new Exception($"unexpected syntax {syntax.Kind}");
         }

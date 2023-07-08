@@ -25,6 +25,7 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
             _diagnostics.AddRange(lexer.Diagonostics);
 
         }
+        public DiagnosticBag Diagnostics => _diagnostics;
         private SyntaxToken Current => Peek(0);
         private SyntaxToken NextToken()
         {
@@ -41,7 +42,6 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
             _diagnostics.ReportUnexpectedToken(Current.span, Current.Kind, kind);
             return new SyntaxToken(kind, Current.Position, null, null);
         }
-        public DiagnosticBag Diagnostics => _diagnostics;
         private SyntaxToken Peek(int offset)
         {
             var index = _position + offset;

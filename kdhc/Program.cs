@@ -28,14 +28,12 @@ namespace KAEDEHARA_COMPILER
                     Console.Clear();
                     continue;
                 }
-                // var parser = new Parser(line);
                 var syntaxTree = SyntaxTree.Parse(line);
                 var compilation = new Compilation(syntaxTree);
                 var result = compilation.Evaluate(variables);
                 var diagnostics = result.Diagnostics;
                 if (ShowTree)
                 {
-                    var color = Console.ForegroundColor;
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     PrettyPrint(syntaxTree.Root);
                     Console.ResetColor();
@@ -56,16 +54,13 @@ namespace KAEDEHARA_COMPILER
                         var prefix = line.Substring(0, diag.Span.Start);
                         var error = line.Substring(diag.Span.Start, diag.Span.Length);
                         var suffix = line.Substring(diag.Span.End);
-                        Console.Write("    ");
+                         Console.Write("    ");
                         Console.Write(prefix);
                         Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.Write(error);
                         Console.ResetColor();
                         Console.Write(suffix);
-                        Console.ResetColor();
                         Console.WriteLine();
-
-
                     }
                     Console.WriteLine();
 

@@ -30,23 +30,25 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
         }
         public SyntaxToken Lex()
         {
-            var start = _position;
 
             if (_position >= _text.Length)
             {
                 return new SyntaxToken(SyntaxKind.EndOfFileToken, _position, "\0", null);
             }
+            var start = _position;
             if (char.IsDigit(Current))
             {
                 while (char.IsDigit(Current))
                 {
                     Next();
-                    var length = _position - start;
-                    var text = _text.Substring(start, length);
-                    if (!int.TryParse(text, out var value))
-                        _diagnostics.ReportInvalidNumber(new TextSpan(start, length), _text, typeof(int));
-                    return new SyntaxToken(SyntaxKind.NumberToken, start, text, value);
+
                 }
+                var length = _position - start;
+                var text = _text.Substring(start, length);
+                if (!int.TryParse(text, out var value))
+                    _diagnostics.ReportInvalidNumber(new TextSpan(start, length), _text, typeof(int));
+
+                return new SyntaxToken(SyntaxKind.NumberToken, start, text, value);
 
             }
             if (char.IsWhiteSpace(Current))
