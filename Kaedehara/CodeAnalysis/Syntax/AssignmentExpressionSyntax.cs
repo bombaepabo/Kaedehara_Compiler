@@ -1,4 +1,4 @@
-using KAEDEHARA_COMPILER.CodeAnalysis.Syntax;
+using Kaedehara.CodeAnalysis.Syntax;
 
 namespace Kaedehara.CodeAnalysis.Syntax
 {

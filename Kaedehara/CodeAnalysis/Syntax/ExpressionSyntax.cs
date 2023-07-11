@@ -1,8 +1,9 @@
-namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
+namespace Kaedehara.CodeAnalysis.Syntax
 {
-   public abstract class  ExpressionSyntax:SyntaxNode {
+    public abstract class ExpressionSyntax : SyntaxNode
+    {
 
-}
+    }
 
 
 

@@ -1,7 +1,9 @@
-namespace KAEDEHARA_COMPILER.CodeAnalysis
+namespace Kaedehara.CodeAnalysis
 {
-    public sealed class VariableSymbol {
-        internal VariableSymbol(string name,Type type){
+    public sealed class VariableSymbol
+    {
+        internal VariableSymbol(string name, Type type)
+        {
             Name = name;
             Type = type;
         }

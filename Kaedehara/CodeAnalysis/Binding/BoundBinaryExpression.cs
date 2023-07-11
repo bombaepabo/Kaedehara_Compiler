@@ -1,4 +1,4 @@
-namespace KAEDEHARA_COMPILER.CodeAnalysis.Binding;
+namespace Kaedehara.CodeAnalysis.Binding;
 internal sealed partial class BoundBinaryExpression : BoundExpression
 {
     public BoundBinaryExpression(BoundExpression left, BoundBinaryOperator op, BoundExpression right)

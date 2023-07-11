@@ -1,4 +1,4 @@
-namespace KAEDEHARA_COMPILER.CodeAnalysis.Binding;
+namespace Kaedehara.CodeAnalysis.Binding;
 
 internal abstract class BoundExpression : BoundNode
 {

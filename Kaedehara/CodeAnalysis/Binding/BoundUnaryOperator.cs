@@ -1,6 +1,6 @@
-using KAEDEHARA_COMPILER.CodeAnalysis.Syntax;
+using Kaedehara.CodeAnalysis.Syntax;
 
-namespace KAEDEHARA_COMPILER.CodeAnalysis.Binding;
+namespace Kaedehara.CodeAnalysis.Binding;
 
 internal sealed class BoundUnaryOperator
 {

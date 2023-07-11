@@ -1,7 +1,7 @@
-﻿using KAEDEHARA_COMPILER.CodeAnalysis.Syntax;
-using KAEDEHARA_COMPILER.CodeAnalysis.Binding;
-using KAEDEHARA_COMPILER.CodeAnalysis;
-namespace KAEDEHARA_COMPILER
+﻿using Kaedehara.CodeAnalysis.Syntax;
+using Kaedehara.CodeAnalysis.Binding;
+using Kaedehara.CodeAnalysis;
+namespace kdhc
 {
     internal static class Program
     {
@@ -54,7 +54,7 @@ namespace KAEDEHARA_COMPILER
                         var prefix = line.Substring(0, diag.Span.Start);
                         var error = line.Substring(diag.Span.Start, diag.Span.Length);
                         var suffix = line.Substring(diag.Span.End);
-                         Console.Write("    ");
+                        Console.Write("    ");
                         Console.Write(prefix);
                         Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.Write(error);

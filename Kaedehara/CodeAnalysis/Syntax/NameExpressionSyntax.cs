@@ -1,8 +1,9 @@
-namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
+namespace Kaedehara.CodeAnalysis.Syntax
 {
     public sealed class NameExpressionSyntax : ExpressionSyntax
     {
-        public  NameExpressionSyntax(SyntaxToken identifierToken){
+        public NameExpressionSyntax(SyntaxToken identifierToken)
+        {
             IdentifierToken = identifierToken;
         }
 
@@ -11,9 +12,9 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {
-            yield return IdentifierToken ;
+            yield return IdentifierToken;
         }
-    } 
+    }
 
 
 

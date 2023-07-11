@@ -1,7 +1,9 @@
-namespace KAEDEHARA_COMPILER.CodeAnalysis
+namespace Kaedehara.CodeAnalysis
 {
-    public sealed class Diagnostic {
-        public Diagnostic(TextSpan span,string message){
+    public sealed class Diagnostic
+    {
+        public Diagnostic(TextSpan span, string message)
+        {
             Span = span;
             Message = message;
         }
@@ -9,7 +11,7 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis
         public TextSpan Span { get; }
         public string Message { get; }
         public override string ToString() => Message;
-       
+
     }
 
 

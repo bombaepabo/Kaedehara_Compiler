@@ -1,4 +1,4 @@
-namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
+namespace Kaedehara.CodeAnalysis.Syntax
 {
     public sealed class SyntaxTree
     {
@@ -18,7 +18,21 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
             var parser = new Parser(text);
             return parser.Parse();
         }
+        public static IEnumerable<SyntaxToken> ParseToken(string text)
+        {
+            var lexer = new Lexer(text);
+            while (true)
+            {
+                var token = lexer.Lex();
+                if (token.Kind == SyntaxKind.EndOfFileToken)
+                {
+                    break;
+                }
+                yield return token;
+            }
+        }
     }
+
 
 
 

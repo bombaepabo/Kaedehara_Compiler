@@ -1,7 +1,7 @@
 using Kaedehara.CodeAnalysis.Syntax;
-using KAEDEHARA_COMPILER.CodeAnalysis.Syntax;
+using Kaedehara.CodeAnalysis.Syntax;
 
-namespace KAEDEHARA_COMPILER.CodeAnalysis.Binding;
+namespace Kaedehara.CodeAnalysis.Binding;
 internal sealed class Binder
 {
     private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
@@ -11,9 +11,9 @@ internal sealed class Binder
         Variables = variables;
     }
 
-    public DiagnosticBag Diagnostics  => _diagnostics;
+    public DiagnosticBag Diagnostics => _diagnostics;
 
-    private readonly Dictionary<VariableSymbol, object> Variables ;
+    private readonly Dictionary<VariableSymbol, object> Variables;
 
     public BoundExpression BindExpression(ExpressionSyntax syntax)
     {
@@ -25,7 +25,7 @@ internal sealed class Binder
                 return BindLiteralExpression((LiteralExpressionSyntax)syntax);
             case SyntaxKind.NameExpression:
                 return BindNameExpression(((NameExpressionSyntax)syntax));
-             case SyntaxKind.AssignmentExpression:
+            case SyntaxKind.AssignmentExpression:
                 return BindAssignmentExpression(((AssignmentExpressionSyntax)syntax));
             case SyntaxKind.UnaryExpression:
                 return BindUnaryExpression((UnaryExpressionSyntax)syntax);
@@ -39,10 +39,11 @@ internal sealed class Binder
 
     private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
     {
-        var name = syntax.IdentifierToken.Text; 
+        var name = syntax.IdentifierToken.Text;
         var variable = Variables.Keys.FirstOrDefault(v => v.Name == name);
-        if(variable == null){
-            _diagnostics.ReportUndefinedName(syntax.IdentifierToken.span,name);
+        if (variable == null)
+        {
+            _diagnostics.ReportUndefinedName(syntax.IdentifierToken.span, name);
             return new BoundLiteralExpression(0);
         }
         return new BoundVariableExpression(variable);
@@ -52,12 +53,13 @@ internal sealed class Binder
         var name = syntax.IdentifierToken.Text;
         var boundExpression = BindExpression(syntax.Expression);
         var existingVariable = Variables.Keys.FirstOrDefault(v => v.Name == name);
-        if(existingVariable != null){
+        if (existingVariable != null)
+        {
             Variables.Remove(existingVariable);
         }
-        var variable = new VariableSymbol(name,boundExpression.type);
-        Variables[variable] = null ;
-        return new BoundAssignmentExpression(variable,boundExpression);
+        var variable = new VariableSymbol(name, boundExpression.type);
+        Variables[variable] = null;
+        return new BoundAssignmentExpression(variable, boundExpression);
     }
 
     private BoundExpression BindParenthesizedExpression(ParenthesizedExpressionSyntax syntax)
@@ -71,7 +73,7 @@ internal sealed class Binder
         var boundOperator = BoundUnaryOperator.Bind(syntax.Operatortoken.Kind, boundOperand.type);
         if (boundOperator == null)
         {
-            _diagnostics.ReportUndefinedUnaryOperator(syntax.Operatortoken.span,syntax.Operatortoken.Text,boundOperand.type);
+            _diagnostics.ReportUndefinedUnaryOperator(syntax.Operatortoken.span, syntax.Operatortoken.Text, boundOperand.type);
             return boundOperand;
         }
         return new BoundUnaryExpression(boundOperator, boundOperand);
@@ -85,7 +87,7 @@ internal sealed class Binder
         var boundOperator = BoundBinaryOperator.Bind(syntax.Operatortoken.Kind, boundLeft.type, boundRight.type);
         if (boundOperator == null)
         {
-            _diagnostics.ReportUndefinedBinaryOperator(syntax.Operatortoken.span,syntax.Operatortoken.Text,boundLeft.type,boundRight.type);
+            _diagnostics.ReportUndefinedBinaryOperator(syntax.Operatortoken.span, syntax.Operatortoken.Text, boundLeft.type, boundRight.type);
             return boundLeft;
         }
         return new BoundBinaryExpression(boundLeft, boundOperator, boundRight);

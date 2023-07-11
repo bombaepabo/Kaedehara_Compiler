@@ -1,11 +1,11 @@
-using KAEDEHARA_COMPILER.CodeAnalysis.Binding;
+using Kaedehara.CodeAnalysis.Binding;
 using System;
 using System.Collections.Generic;
-namespace KAEDEHARA_COMPILER.CodeAnalysis
+namespace Kaedehara.CodeAnalysis
 {
     internal sealed class Evaluator
     {
-        private readonly Dictionary<VariableSymbol, object> Variables ;
+        private readonly Dictionary<VariableSymbol, object> Variables;
         private readonly BoundExpression _root;
 
         public Evaluator(BoundExpression root, Dictionary<VariableSymbol, object> variables)
@@ -26,23 +26,26 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis
             {
                 return n.Value;
             }
-            if (node is BoundVariableExpression v){
-                return Variables[v.Variable];;
+            if (node is BoundVariableExpression v)
+            {
+                return Variables[v.Variable]; ;
             }
-            if(node is BoundAssignmentExpression a){
+            if (node is BoundAssignmentExpression a)
+            {
                 var value = EvaluateExpression(a.Expression);
-                Variables[a.Variable] = value ;
-                return value ;
+                Variables[a.Variable] = value;
+                return value;
             }
-            if (node is BoundUnaryExpression u){
-                var operand =  EvaluateExpression(u.Operand);
+            if (node is BoundUnaryExpression u)
+            {
+                var operand = EvaluateExpression(u.Operand);
                 switch (u.Op.Kind)
                 {
                     case BoundUnaryOperatorKind.identity:
                         return (int)operand;
                     case BoundUnaryOperatorKind.Negation:
                         return -(int)operand;
-                     case BoundUnaryOperatorKind.LogicalNegation:
+                    case BoundUnaryOperatorKind.LogicalNegation:
                         return !(bool)operand;
                     default:
                         throw new Exception($"unexpected unary operator {u.Op.Kind}");
@@ -51,27 +54,27 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis
             }
             if (node is BoundBinaryExpression b)
             {
-                var left =  EvaluateExpression(b.Left);
+                var left = EvaluateExpression(b.Left);
                 var right = EvaluateExpression(b.Right);
 
                 switch (b.Op.Kind)
                 {
                     case BoundBinaryOperatorKind.Addition:
-                        return (int) left + (int)right;
+                        return (int)left + (int)right;
                     case BoundBinaryOperatorKind.Subtraction:
-                        return (int) left - (int)right;
+                        return (int)left - (int)right;
                     case BoundBinaryOperatorKind.Multiplication:
-                        return (int) left * (int)right;
+                        return (int)left * (int)right;
                     case BoundBinaryOperatorKind.Division:
-                        return (int) left / (int)right;
+                        return (int)left / (int)right;
                     case BoundBinaryOperatorKind.LogicalAnd:
-                        return (bool) left && (bool)right;
+                        return (bool)left && (bool)right;
                     case BoundBinaryOperatorKind.LogicalOr:
-                        return (bool) left || (bool)right;
+                        return (bool)left || (bool)right;
                     case BoundBinaryOperatorKind.Equals:
-                        return Equals(left,right);
-                     case BoundBinaryOperatorKind.NotEquals:
-                        return !Equals(left,right);
+                        return Equals(left, right);
+                    case BoundBinaryOperatorKind.NotEquals:
+                        return !Equals(left, right);
 
                     default:
                         throw new Exception($"unexpected binary operator {b.Op.Kind}");

@@ -1,7 +1,9 @@
-namespace KAEDEHARA_COMPILER.CodeAnalysis
+namespace Kaedehara.CodeAnalysis
 {
-    public sealed class EvaluationResult{
-        public EvaluationResult(IEnumerable<Diagnostic> diagnostics,object value){
+    public sealed class EvaluationResult
+    {
+        public EvaluationResult(IEnumerable<Diagnostic> diagnostics, object value)
+        {
             Diagnostics = diagnostics.ToArray();
             Value = value;
         }

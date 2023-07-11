@@ -1,7 +1,9 @@
-namespace KAEDEHARA_COMPILER.CodeAnalysis
+namespace Kaedehara.CodeAnalysis
 {
-    public struct TextSpan{
-        public TextSpan(int start,int length){
+    public struct TextSpan
+    {
+        public TextSpan(int start, int length)
+        {
             Start = start;
             Length = length;
         }

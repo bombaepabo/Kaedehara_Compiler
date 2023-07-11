@@ -1,6 +1,6 @@
 using Kaedehara.CodeAnalysis.Syntax;
 
-namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
+namespace Kaedehara.CodeAnalysis.Syntax
 {
     internal sealed class Parser
     {

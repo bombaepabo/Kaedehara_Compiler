@@ -1,7 +1,7 @@
 using System.Collections;
-using KAEDEHARA_COMPILER.CodeAnalysis.Syntax;
+using Kaedehara.CodeAnalysis.Syntax;
 
-namespace KAEDEHARA_COMPILER.CodeAnalysis
+namespace Kaedehara.CodeAnalysis
 {
     internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
     {
@@ -16,21 +16,22 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis
         }
         public void ReportBadCharacter(int position, char character)
         {
-            var span = new TextSpan(position,1);
-            var message = $"ERROR: bad charactor input: '{character}'" ; 
-            Report(span,message);
+            var span = new TextSpan(position, 1);
+            var message = $"ERROR: bad charactor input: '{character}'";
+            Report(span, message);
         }
 
         public void ReportInvalidNumber(TextSpan span, string text, Type type)
         {
             var message = $"The number {text} isn't valid {type}";
-            Report(span,message);
+            Report(span, message);
         }
 
-    
 
-        private void Report(TextSpan span , string message ){
-            var diagonostic = new Diagnostic(span,message);
+
+        private void Report(TextSpan span, string message)
+        {
+            var diagonostic = new Diagnostic(span, message);
             _diagnostics.Add(diagonostic);
 
         }
@@ -38,25 +39,25 @@ namespace KAEDEHARA_COMPILER.CodeAnalysis
         internal void ReportUnexpectedToken(TextSpan span, SyntaxKind actualKind, SyntaxKind expectedKind)
         {
             var message = $"Unexpected token <{actualKind}>, expected <{expectedKind}>";
-            Report(span,message);
+            Report(span, message);
         }
 
         internal void ReportUndefinedUnaryOperator(TextSpan span, string operatorText, Type operandType)
         {
             var message = $"Unary operator '{operatorText}' is not defined for type {operandType}.";
-            Report(span,message);
+            Report(span, message);
         }
 
         internal void ReportUndefinedBinaryOperator(TextSpan span, string operatorText, Type boundLeft, Type boundRight)
         {
-            var message = $"Binary operator '{operatorText}' is not defined for type {boundLeft} and {boundRight}." ;
-            Report(span,message);
+            var message = $"Binary operator '{operatorText}' is not defined for type {boundLeft} and {boundRight}.";
+            Report(span, message);
         }
 
         internal void ReportUndefinedName(TextSpan span, string name)
         {
-              var message = $"Variables'{name}' doesn't exist." ;
-            Report(span,message);
+            var message = $"Variables'{name}' doesn't exist.";
+            Report(span, message);
         }
     }
 

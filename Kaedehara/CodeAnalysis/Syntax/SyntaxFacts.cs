@@ -1,4 +1,4 @@
-namespace KAEDEHARA_COMPILER.CodeAnalysis.Syntax
+namespace Kaedehara.CodeAnalysis.Syntax
 {
     internal static class SyntaxFacts
     {
