@@ -1,6 +1,6 @@
 using Kaedehara.CodeAnalysis.Syntax;
 namespace Kaedehara.Tests.CodeAnalysis.Syntax;
-public class UnitTest1
+public class LexerTest
 {
     [Theory]
     [MemberData(nameof(GetTokensData))]
@@ -24,6 +24,22 @@ public class UnitTest1
         Assert.Equal(tokens[1].Kind, t2Kind);
         Assert.Equal(tokens[1].Text, t2Text);
     }
+     [Theory]
+    [MemberData(nameof(GetTokenPairsWithSeperatorData))]
+    public void Lexer_Lexes_TokenPairs_WithSeparators(SyntaxKind t1Kind, string t1Text,SyntaxKind seperatorKind,string seperatorText,SyntaxKind t2Kind, string t2Text)
+    {
+        var text = t1Text + seperatorText + t2Text;
+        var tokens = SyntaxTree.ParseToken(text).ToArray();
+        Assert.Equal(3,tokens.Length);
+        Assert.Equal(tokens[0].Kind, t1Kind);
+        Assert.Equal(tokens[0].Text, t1Text);
+
+        Assert.Equal(tokens[1].Kind, seperatorKind);
+        Assert.Equal(tokens[1].Text, seperatorText);
+
+        Assert.Equal(tokens[2].Kind, t2Kind);
+        Assert.Equal(tokens[2].Text, t2Text);
+    }
     public static IEnumerable<object[]> GetTokensData()
     {
         foreach (var t in GetTokens().Concat(GetSeperators()))
@@ -36,6 +52,13 @@ public class UnitTest1
         foreach (var t in GetTokenPairs())
         {
             yield return new object[] { t.t1Kind,t.t1Text,t.t2Kind,t.t2Text};
+        }
+    }
+      public static IEnumerable<object[]> GetTokenPairsWithSeperatorData()
+    {
+        foreach (var t in GetTokenPairsWithSeperator())
+        {
+            yield return new object[] { t.t1Kind,t.t1Text,t.seperatorKind,t.seperatorText,t.t2Kind,t.t2Text};
         }
     }
     public static IEnumerable<(SyntaxKind kind, string text)> GetTokens()
@@ -121,6 +144,19 @@ public class UnitTest1
             foreach (var t2 in GetTokens()){
                 if(!RequiresSeparator(t1.kind,t2.kind)){
                 yield return (t1.kind,t1.text,t2.kind,t2.text);
+            
+            }
+        }
+    }
+}
+  private static IEnumerable<(SyntaxKind t1Kind,string t1Text,SyntaxKind seperatorKind,string seperatorText,SyntaxKind t2Kind,string t2Text)> GetTokenPairsWithSeperator()
+    {
+        foreach (var t1 in GetTokens()){
+            foreach (var t2 in GetTokens()){
+                if(!RequiresSeparator(t1.kind,t2.kind)){
+                    foreach(var s in GetSeperators()){
+                        yield return (t1.kind,t1.text,s.kind,s.text,t2.kind,t2.text);
+                    }
             
             }
         }
