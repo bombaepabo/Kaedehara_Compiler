@@ -14,7 +14,7 @@ namespace Kaedehara.CodeAnalysis.Syntax
            public static IEnumerable<SyntaxKind> GetUnaryOperatorKinds(){
                 var kinds = (SyntaxKind[]) Enum.GetValues(typeof(SyntaxKind));
                 foreach(var kind in kinds){
-                    if(GetUanaryOperatorPrecedence(kind) >0){
+                    if(GetUnaryOperatorPrecedence(kind) >0){
                         yield return kind ;
                     }
                 }
@@ -42,7 +42,7 @@ namespace Kaedehara.CodeAnalysis.Syntax
                     return 0;
             }
         }
-        public static int GetUanaryOperatorPrecedence(this SyntaxKind kind)
+        public static int GetUnaryOperatorPrecedence(this SyntaxKind kind)
         {
             switch (kind)
             {
