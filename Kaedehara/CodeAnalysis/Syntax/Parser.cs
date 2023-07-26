@@ -1,13 +1,17 @@
+using System.Collections.Immutable;
 using Kaedehara.CodeAnalysis.Syntax;
+using Kaedehara.CodeAnalysis.Text;
 
 namespace Kaedehara.CodeAnalysis.Syntax
 {
     internal sealed class Parser
     {
-        private readonly SyntaxToken[] _tokens;
+        private readonly ImmutableArray<SyntaxToken> _tokens;
         private int _position;
-        private DiagnosticBag _diagnostics = new DiagnosticBag();
-        public Parser(string text)
+        private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
+        private readonly SourceText _text;
+
+        public Parser(SourceText text)
         {
             var tokens = new List<SyntaxToken>();
             var lexer = new Lexer(text);
@@ -21,9 +25,9 @@ namespace Kaedehara.CodeAnalysis.Syntax
                 }
             }
             while (token.Kind != SyntaxKind.EndOfFileToken);
-            _tokens = tokens.ToArray();
+            _tokens = tokens.ToImmutableArray();
             _diagnostics.AddRange(lexer.Diagonostics);
-
+            _text = text;
         }
         public DiagnosticBag Diagnostics => _diagnostics;
         private SyntaxToken Current => Peek(0);
@@ -56,7 +60,7 @@ namespace Kaedehara.CodeAnalysis.Syntax
         {
             var expression = ParseExpression();
             var endOfFileToken = MatchToken(SyntaxKind.EndOfFileToken);
-            return new SyntaxTree(_diagnostics, expression, endOfFileToken);
+            return new SyntaxTree(_text,_diagnostics.ToImmutableArray(), expression, endOfFileToken);
         }
         private ExpressionSyntax ParseExpression()
         {
@@ -112,34 +116,53 @@ namespace Kaedehara.CodeAnalysis.Syntax
             {
                 case SyntaxKind.OpenParenthesisToken:
                     {
-                        var left = NextToken();
-                        var expression = ParseExpression();
-                        var right = MatchToken(SyntaxKind.CloseParenthesisToken);
-                        return new ParenthesizedExpressionSyntax(left, expression, right);
+                        return ParseParenthesizedExpression();
                     }
 
                 case SyntaxKind.FalseKeyword:
                 case SyntaxKind.TrueKeyword:
                     {
-                        var keywordToken = NextToken();
-                        var value = keywordToken.Kind == SyntaxKind.TrueKeyword;
-                        return new LiteralExpressionSyntax(keywordToken, value);
+                        return ParseBooleanLiteral();
                     }
                 case SyntaxKind.IdentifierToken:
                     {
-                        var identifierToken = NextToken();
-                        return new NameExpressionSyntax(identifierToken);
-
+                        return ParseNameExpression();
 
                     }
                 default:
                     {
-                        var numberToken = MatchToken(SyntaxKind.NumberToken);
-                        return new LiteralExpressionSyntax(numberToken);
+                        return ParseNumberLitheral();
 
                     }
 
             }
+        }
+
+        private ExpressionSyntax ParseNumberLitheral()
+        {
+            var numberToken = MatchToken(SyntaxKind.NumberToken);
+            return new LiteralExpressionSyntax(numberToken);
+        }
+
+        private ExpressionSyntax ParseParenthesizedExpression()
+        {
+            var left = MatchToken(SyntaxKind.OpenParenthesisToken);
+            var expression = ParseExpression();
+            var right = MatchToken(SyntaxKind.CloseParenthesisToken);
+            return new ParenthesizedExpressionSyntax(left, expression, right);
+        }
+
+        private ExpressionSyntax ParseBooleanLiteral()
+        {
+            var isTrue = Current.Kind == SyntaxKind.TrueKeyword;
+            var keywordToken = isTrue ? MatchToken(SyntaxKind.TrueKeyword) : MatchToken(SyntaxKind.FalseKeyword);
+            return new LiteralExpressionSyntax(keywordToken, isTrue);
+        }
+
+        private ExpressionSyntax ParseNameExpression()
+        {
+            var identifierToken = MatchToken(SyntaxKind.IdentifierToken);
+            return new NameExpressionSyntax(identifierToken);
         }
     }
 

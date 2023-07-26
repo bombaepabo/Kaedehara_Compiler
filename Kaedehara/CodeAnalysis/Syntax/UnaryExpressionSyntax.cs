@@ -11,11 +11,6 @@ namespace Kaedehara.CodeAnalysis.Syntax
         public SyntaxToken Operatortoken { get; }
         public ExpressionSyntax Operand { get; }
 
-        public override IEnumerable<SyntaxNode> GetChildren()
-        {
-            yield return Operatortoken;
-            yield return Operand;
-        }
 
     }
 

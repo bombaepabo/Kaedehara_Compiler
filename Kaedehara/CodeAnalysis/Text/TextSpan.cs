@@ -1,4 +1,4 @@
-namespace Kaedehara.CodeAnalysis
+namespace Kaedehara.CodeAnalysis.Text
 {
     public struct TextSpan
     {
@@ -12,6 +12,11 @@ namespace Kaedehara.CodeAnalysis
         public int Length { get; }
         public int End => Start + Length;
 
+        public static TextSpan FromBounds(int start, int end)
+        {
+            var length = end - start ; 
+            return new TextSpan(start,length);
+        }
     }
 
 

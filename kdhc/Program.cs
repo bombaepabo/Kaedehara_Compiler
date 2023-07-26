@@ -1,6 +1,9 @@
 ﻿using Kaedehara.CodeAnalysis.Syntax;
 using Kaedehara.CodeAnalysis.Binding;
 using Kaedehara.CodeAnalysis;
+using System.Text;
+using Kaedehara.CodeAnalysis.Text;
+
 namespace kdhc
 {
     internal static class Program
@@ -9,33 +12,62 @@ namespace kdhc
         {
             var ShowTree = false;
             var variables = new Dictionary<VariableSymbol, object>();
+            var textBuilder = new StringBuilder();
+
             while (true)
             {
-                Console.Write(">");
-                var line = Console.ReadLine();
-                if (string.IsNullOrEmpty(line))
+                if (textBuilder.Length == 0)
                 {
-                    return;
+                    Console.Write("> ");
                 }
-                if (line == "#ShowTree")
+                else
                 {
-                    ShowTree = !ShowTree;
-                    Console.WriteLine(ShowTree ? " Showing parse trees." : "Not showing parse trees");
+                    Console.Write("| ");
+                }
+
+                var input = Console.ReadLine();
+                var isBlank = string.IsNullOrWhiteSpace(input);
+                if (textBuilder.Length == 0)
+                {
+                    if (isBlank)
+                    {
+                        break;
+                    }
+
+                    if (string.IsNullOrEmpty(input))
+                    {
+                        return;
+                    }
+                    if (input == "#ShowTree")
+                    {
+                        ShowTree = !ShowTree;
+                        Console.WriteLine(ShowTree ? " Showing parse trees." : "Not showing parse trees");
+                        continue;
+                    }
+                    else if (input == "#cls")
+                    {
+                        Console.Clear();
+                        continue;
+                    }
+                }
+                else
+                {
+
+                }
+                textBuilder.AppendLine(input);
+                var text = textBuilder.ToString();
+                var syntaxTree = SyntaxTree.Parse(text);
+                if (!isBlank && syntaxTree.Diagnostics.Any())
+                {
                     continue;
                 }
-                else if (line == "#cls")
-                {
-                    Console.Clear();
-                    continue;
-                }
-                var syntaxTree = SyntaxTree.Parse(line);
                 var compilation = new Compilation(syntaxTree);
                 var result = compilation.Evaluate(variables);
                 var diagnostics = result.Diagnostics;
                 if (ShowTree)
                 {
                     Console.ForegroundColor = ConsoleColor.DarkGray;
-                    PrettyPrint(syntaxTree.Root);
+                    syntaxTree.Root.WriteTo(Console.Out);
                     Console.ResetColor();
                 }
 
@@ -48,12 +80,21 @@ namespace kdhc
                 {
                     foreach (var diag in diagnostics)
                     {
+                        var lineIndex = syntaxTree.Text.GetLineIndex(diag.Span.Start);
+                        var line = syntaxTree.Text.Lines[lineIndex];
+                        var lineNumber = lineIndex + 1;
+                        var character = diag.Span.Start - line.Start + 1;
+
+
                         Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.Write($"({lineNumber},{character}): ");
                         Console.WriteLine(diag);
                         Console.ResetColor();
-                        var prefix = line.Substring(0, diag.Span.Start);
-                        var error = line.Substring(diag.Span.Start, diag.Span.Length);
-                        var suffix = line.Substring(diag.Span.End);
+                        var prefixSpan = TextSpan.FromBounds(line.Start, diag.Span.Start);
+                        var suffixSpan = TextSpan.FromBounds(diag.Span.End, line.End);
+                        var prefix = syntaxTree.Text.ToString(prefixSpan);
+                        var error = syntaxTree.Text.ToString(diag.Span);
+                        var suffix = syntaxTree.Text.ToString(suffixSpan);
                         Console.Write("    ");
                         Console.Write(prefix);
                         Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -65,29 +106,7 @@ namespace kdhc
                     Console.WriteLine();
 
                 }
-            }
-        }
-        static void PrettyPrint(SyntaxNode node, string indent = "", bool isLast = true)
-        {
-            var marker = isLast ? "└──" : "├──";
-
-            Console.Write(indent);
-            Console.Write(marker);
-
-            Console.Write(node.Kind);
-            if (node is SyntaxToken t && t.Value != null)
-            {
-                Console.Write(" ");
-                Console.Write(t.Value);
-
-            }
-            Console.WriteLine();
-
-            indent += isLast ? "    " : "│  ";
-            var lastChild = node.GetChildren().LastOrDefault();
-            foreach (var child in node.GetChildren())
-            {
-                PrettyPrint(child, indent, child == lastChild);
+                textBuilder.Clear();
             }
         }
 

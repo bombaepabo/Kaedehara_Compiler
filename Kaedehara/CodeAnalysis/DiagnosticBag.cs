@@ -1,5 +1,6 @@
 using System.Collections;
 using Kaedehara.CodeAnalysis.Syntax;
+using Kaedehara.CodeAnalysis.Text;
 
 namespace Kaedehara.CodeAnalysis
 {

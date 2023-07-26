@@ -1,24 +1,40 @@
+using System.Collections.Immutable;
+using Kaedehara.CodeAnalysis.Text;
+
 namespace Kaedehara.CodeAnalysis.Syntax
 {
     public sealed class SyntaxTree
     {
-        public SyntaxTree(IEnumerable<Diagnostic> diagnostics, ExpressionSyntax root, SyntaxToken endOfFileToken)
+        public SyntaxTree(SourceText text,ImmutableArray<Diagnostic> diagnostics, ExpressionSyntax root, SyntaxToken endOfFileToken)
         {
+            Text = text;
             Diagnostics = diagnostics;
             Root = root;
             EndOfFileToken = endOfFileToken;
         }
 
-        public IEnumerable<Diagnostic> Diagnostics { get; }
+        public SourceText Text { get; }
+        public ImmutableArray<Diagnostic> Diagnostics { get; }
         public ExpressionSyntax Root { get; }
         public SyntaxToken EndOfFileToken { get; }
 
         public static SyntaxTree Parse(string text)
         {
+            var sourceText = SourceText.From(text);
+            return Parse(sourceText);
+        }
+        public static SyntaxTree Parse(SourceText text)
+        {
             var parser = new Parser(text);
             return parser.Parse();
         }
-        public static IEnumerable<SyntaxToken> ParseToken(string text)
+         public static IEnumerable<SyntaxToken> ParseToken(string text)
+        {
+            var sourceText = SourceText.From(text);
+            return ParseToken(sourceText);
+        }
+        
+        public static IEnumerable<SyntaxToken> ParseToken(SourceText text)
         {
             var lexer = new Lexer(text);
             while (true)

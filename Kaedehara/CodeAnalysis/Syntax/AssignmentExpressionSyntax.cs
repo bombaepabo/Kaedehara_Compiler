@@ -17,12 +17,5 @@ namespace Kaedehara.CodeAnalysis.Syntax
 
         public override SyntaxKind Kind => SyntaxKind.AssignmentExpression;
 
-        public override IEnumerable<SyntaxNode> GetChildren()
-        {
-            yield return IdentifierToken;
-            yield return EqualToken;
-            yield return Expression;
-
-        }
     }
 }

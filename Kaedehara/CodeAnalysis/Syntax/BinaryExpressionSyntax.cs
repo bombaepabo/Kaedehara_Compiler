@@ -13,13 +13,6 @@ namespace Kaedehara.CodeAnalysis.Syntax
         public SyntaxToken Operatortoken { get; }
         public ExpressionSyntax Right { get; }
 
-        public override IEnumerable<SyntaxNode> GetChildren()
-        {
-            yield return Left;
-            yield return Operatortoken;
-            yield return Right;
-        }
-
     }
 
 

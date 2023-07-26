@@ -1,3 +1,5 @@
+using Kaedehara.CodeAnalysis.Text;
+
 namespace Kaedehara.CodeAnalysis
 {
     public sealed class Diagnostic

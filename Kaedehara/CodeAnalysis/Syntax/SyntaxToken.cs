@@ -1,3 +1,5 @@
+using Kaedehara.CodeAnalysis.Text;
+
 namespace Kaedehara.CodeAnalysis.Syntax
 {
     public sealed class SyntaxToken : SyntaxNode
@@ -13,12 +15,8 @@ namespace Kaedehara.CodeAnalysis.Syntax
         public int Position { get; }
         public string Text { get; }
         public Object Value { get; }
-        public TextSpan span => new TextSpan(Position, Text.Length);
+        public TextSpan span => new TextSpan(Position, Text?.Length ?? 0);
 
-        public override IEnumerable<SyntaxNode> GetChildren()
-        {
-            return Enumerable.Empty<SyntaxNode>();
-        }
     }
 
 

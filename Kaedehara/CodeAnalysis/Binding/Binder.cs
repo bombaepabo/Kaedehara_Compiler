@@ -1,5 +1,4 @@
 using Kaedehara.CodeAnalysis.Syntax;
-using Kaedehara.CodeAnalysis.Syntax;
 
 namespace Kaedehara.CodeAnalysis.Binding;
 internal sealed class Binder
