@@ -10,7 +10,7 @@ namespace Kaedehara.CodeAnalysis
 
         public Evaluator(BoundExpression root, Dictionary<VariableSymbol, object> variables)
         {
-            this._root = root;
+            _root = root;
             Variables = variables;
         }
 

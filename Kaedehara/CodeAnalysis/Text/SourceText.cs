@@ -50,11 +50,12 @@ namespace Kaedehara.CodeAnalysis.Text
                     lineStart = position;
                 }
             }
-            if(position > lineStart){
+            if(position >= lineStart){
                 Addline(result,sourceText, position, lineStart, 0);
                                     }
             return result.ToImmutable();
         }
+
 
         private static void Addline(ImmutableArray<TextLine>.Builder result, SourceText sourceText, int position, int lineStart, int lineBreakWidth)
         {
