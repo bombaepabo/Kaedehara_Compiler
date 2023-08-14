@@ -26,7 +26,8 @@ namespace Kaedehara.CodeAnalysis.Syntax
         NotEqualToken,
         NameExpression,
         AssignmentExpression,
-        EqualsToken
+        EqualsToken,
+        CompilationUnit
     }
 
 

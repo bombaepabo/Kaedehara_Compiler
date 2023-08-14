@@ -1,50 +1,65 @@
 using Kaedehara.CodeAnalysis.Text;
-
 namespace Kaedehara.CodeAnalysis.Syntax
 {
     public abstract class SyntaxNode
     {
         public abstract SyntaxKind Kind { get; }
-        public virtual TextSpan Span {
-            get{
+        public virtual TextSpan Span
+        {
+            get
+            {
                 var first = GetChildren().First().Span;
                 var last = GetChildren().Last().Span;
-                return TextSpan.FromBounds(first.Start,last.End);
+                return TextSpan.FromBounds(first.Start, last.End);
             }
         }
-        public IEnumerable<SyntaxNode> GetChildren(){
+        public IEnumerable<SyntaxNode> GetChildren()
+        {
             var properties = GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-            foreach(var property in properties){
-                if(typeof(SyntaxNode).IsAssignableFrom(property.PropertyType))
+            foreach (var property in properties)
+            {
+                if (typeof(SyntaxNode).IsAssignableFrom(property.PropertyType))
                 {
                     var child = (SyntaxNode)property.GetValue(this);
                     yield return child;
                 }
-                else if(typeof(IEnumerable<SyntaxNode>).IsAssignableFrom(property.PropertyType))
+                else if (typeof(IEnumerable<SyntaxNode>).IsAssignableFrom(property.PropertyType))
                 {
                     var values = (IEnumerable<SyntaxNode>)property.GetValue(this);
-                    foreach(var child in values){
-                        yield return child ;
+                    foreach (var child in values)
+                    {
+                        yield return child;
                     }
                 }
             }
         }
-        public void WriteTo(TextWriter writer){
-            PrettyPrint(writer,this);
+        public void WriteTo(TextWriter writer)
+        {
+            PrettyPrint(writer, this);
         }
         public override string ToString()
         {
-            using(var writer = new StringWriter()){
+            using (var writer = new StringWriter())
+            {
                 WriteTo(writer);
                 return writer.ToString();
             }
         }
-        private static void PrettyPrint(TextWriter writer,SyntaxNode node, string indent = "", bool isLast = true)
+        private static void PrettyPrint(TextWriter writer, SyntaxNode node, string indent = "", bool isLast = true)
         {
+            var isToConsole = writer == Console.Out;
             var marker = isLast ? "└──" : "├──";
 
             writer.Write(indent);
-            writer.Write(marker);
+            if (isToConsole)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+            }
+                writer.Write(marker);
+             if (isToConsole)
+            {
+                Console.ForegroundColor = node is SyntaxToken ? ConsoleColor.Blue : ConsoleColor.Cyan;
+            }
 
             writer.Write(node.Kind);
             if (node is SyntaxToken t && t.Value != null)
@@ -53,13 +68,16 @@ namespace Kaedehara.CodeAnalysis.Syntax
                 writer.Write(t.Value);
 
             }
+            if(isToConsole){
+                Console.ResetColor();
+            }
             writer.WriteLine();
 
             indent += isLast ? "    " : "│  ";
             var lastChild = node.GetChildren().LastOrDefault();
             foreach (var child in node.GetChildren())
             {
-                PrettyPrint(writer,child, indent, child == lastChild);
+                PrettyPrint(writer, child, indent, child == lastChild);
             }
         }
     }
