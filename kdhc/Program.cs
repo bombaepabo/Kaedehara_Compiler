@@ -13,6 +13,7 @@ namespace kdhc
             var ShowTree = false;
             var variables = new Dictionary<VariableSymbol, object>();
             var textBuilder = new StringBuilder();
+            Compilation previous = null ;
 
             while (true)
             {
@@ -63,7 +64,9 @@ namespace kdhc
                 {
                     continue;
                 }
-                var compilation = new Compilation(syntaxTree);
+                var compilation =   previous ==null ?
+                                    new Compilation(syntaxTree)
+                                    :previous.ContinuedWith(syntaxTree);
                 var result = compilation.Evaluate(variables);
                 var diagnostics = result.Diagnostics;
                 if (ShowTree)
@@ -78,7 +81,7 @@ namespace kdhc
                     Console.ForegroundColor = ConsoleColor.Magenta;
                     Console.WriteLine(result.Value);
                     Console.ResetColor();
-
+                    previous = compilation;
                 }
                 else
                 {

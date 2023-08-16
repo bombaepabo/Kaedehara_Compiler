@@ -37,27 +37,33 @@ namespace Kaedehara.CodeAnalysis
 
         }
 
-        internal void ReportUnexpectedToken(TextSpan span, SyntaxKind actualKind, SyntaxKind expectedKind)
+        public void ReportUnexpectedToken(TextSpan span, SyntaxKind actualKind, SyntaxKind expectedKind)
         {
             var message = $"Unexpected token <{actualKind}>, expected <{expectedKind}>";
             Report(span, message);
         }
 
-        internal void ReportUndefinedUnaryOperator(TextSpan span, string operatorText, Type operandType)
+        public void ReportUndefinedUnaryOperator(TextSpan span, string operatorText, Type operandType)
         {
             var message = $"Unary operator '{operatorText}' is not defined for type {operandType}.";
             Report(span, message);
         }
 
-        internal void ReportUndefinedBinaryOperator(TextSpan span, string operatorText, Type boundLeft, Type boundRight)
+        public void ReportUndefinedBinaryOperator(TextSpan span, string operatorText, Type boundLeft, Type boundRight)
         {
             var message = $"Binary operator '{operatorText}' is not defined for type {boundLeft} and {boundRight}.";
             Report(span, message);
         }
 
-        internal void ReportUndefinedName(TextSpan span, string name)
+        public void ReportUndefinedName(TextSpan span, string name)
         {
             var message = $"Variables'{name}' doesn't exist.";
+            Report(span, message);
+        }
+
+        public void ReportVariableAlreadyDeclared(TextSpan span, string name)
+        {
+             var message = $"Variables'{name}' is already declared";
             Report(span, message);
         }
     }

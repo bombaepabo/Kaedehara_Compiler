@@ -1,18 +1,47 @@
+using System.Collections.Immutable;
+using System.Security;
 using Kaedehara.CodeAnalysis.Syntax;
 
-namespace Kaedehara.CodeAnalysis.Binding;
-internal sealed class Binder
+namespace Kaedehara.CodeAnalysis.Binding
 {
-    private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
+    internal sealed class Binder
+{
+    private readonly DiagnosticBag _diagnostics = new();
+    private BoundScope _scope;
 
-    public Binder(Dictionary<VariableSymbol, object> variables)
+    public Binder(BoundScope parent)
     {
-        Variables = variables;
+        _scope = new BoundScope(parent);
     }
 
+    public static BoundGlobalScope BindGlobalScope(BoundGlobalScope previous,CompilationUnitSyntax syntax){
+        var parentScope = CreateParentScopes(previous);
+        var binder = new Binder(parentScope);
+        var expression = binder.BindExpression(syntax.Expression);
+        var variables = binder._scope.GetDeclaredVariables();
+        var diagnostics = binder.Diagnostics.ToImmutableArray();
+        return new BoundGlobalScope(previous,diagnostics,variables,expression);
+    }
+    private static BoundScope CreateParentScopes(BoundGlobalScope previous){
+        var stack = new Stack<BoundGlobalScope>();
+        while(previous != null){
+            stack.Push(previous);
+            previous = previous.Previous ;
+        }
+        BoundScope parent = null;
+        while(stack.Count > 0){
+            previous = stack.Pop();
+            var scope = new BoundScope(parent);
+            foreach (var v in previous.Variables){
+                scope.TryDeclare(v);
+            }
+            parent = scope ;
+            
+        }
+        return parent;
+        
+    }
     public DiagnosticBag Diagnostics => _diagnostics;
-
-    private readonly Dictionary<VariableSymbol, object> Variables;
 
     public BoundExpression BindExpression(ExpressionSyntax syntax)
     {
@@ -39,8 +68,7 @@ internal sealed class Binder
     private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
     {
         var name = syntax.IdentifierToken.Text;
-        var variable = Variables.Keys.FirstOrDefault(v => v.Name == name);
-        if (variable == null)
+        if (!_scope.TryLookup(name,out var variable))
         {
             _diagnostics.ReportUndefinedName(syntax.IdentifierToken.span, name);
             return new BoundLiteralExpression(0);
@@ -51,13 +79,11 @@ internal sealed class Binder
     {
         var name = syntax.IdentifierToken.Text;
         var boundExpression = BindExpression(syntax.Expression);
-        var existingVariable = Variables.Keys.FirstOrDefault(v => v.Name == name);
-        if (existingVariable != null)
-        {
-            Variables.Remove(existingVariable);
-        }
         var variable = new VariableSymbol(name, boundExpression.type);
-        Variables[variable] = null;
+        if(!_scope.TryDeclare(variable)){
+            _diagnostics.ReportVariableAlreadyDeclared(syntax.IdentifierToken.Span,name);
+        }
+       
         return new BoundAssignmentExpression(variable, boundExpression);
     }
 
@@ -99,6 +125,6 @@ internal sealed class Binder
 }
 
 
-
+}
 
 

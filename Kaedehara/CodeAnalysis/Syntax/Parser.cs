@@ -8,7 +8,7 @@ namespace Kaedehara.CodeAnalysis.Syntax
     {
         private readonly ImmutableArray<SyntaxToken> _tokens;
         private int _position;
-        private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
+        private readonly DiagnosticBag _diagnostics = new();
         private readonly SourceText _text;
 
         public Parser(SourceText text)
@@ -56,11 +56,11 @@ namespace Kaedehara.CodeAnalysis.Syntax
             }
             return _tokens[index];
         }
-        public SyntaxTree Parse()
+        public CompilationUnitSyntax ParseCompilationUnit()
         {
             var expression = ParseExpression();
             var endOfFileToken = MatchToken(SyntaxKind.EndOfFileToken);
-            return new SyntaxTree(_text,_diagnostics.ToImmutableArray(), expression, endOfFileToken);
+            return new CompilationUnitSyntax(expression, endOfFileToken);
         }
         private ExpressionSyntax ParseExpression()
         {
@@ -164,6 +164,7 @@ namespace Kaedehara.CodeAnalysis.Syntax
             var identifierToken = MatchToken(SyntaxKind.IdentifierToken);
             return new NameExpressionSyntax(identifierToken);
         }
+
     }
 
 
