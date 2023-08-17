@@ -5,8 +5,8 @@ namespace Kaedehara.CodeAnalysis.Text
     public sealed class SourceText
     {
       private SourceText(string text){
+        _text = text;
         Lines = ParseLines(this,text);
-            _text = text;
         }
         public ImmutableArray<TextLine> Lines {get;}
         public char this[int index] => _text[index];
@@ -77,9 +77,10 @@ namespace Kaedehara.CodeAnalysis.Text
             return 0 ;
         }
 
-        public static SourceText From(string text){
+        public static SourceText From(string text)
+        {
         return new SourceText(text);
-      }
+        }
         public override string ToString() => _text ;
         public string ToString(int start,int length) => _text.Substring(start,length);
         public string ToString(TextSpan span) => ToString(span.Start,span.Length);

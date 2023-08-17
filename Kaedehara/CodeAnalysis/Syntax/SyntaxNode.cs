@@ -1,3 +1,4 @@
+using System.Reflection;
 using Kaedehara.CodeAnalysis.Text;
 namespace Kaedehara.CodeAnalysis.Syntax
 {
@@ -15,7 +16,7 @@ namespace Kaedehara.CodeAnalysis.Syntax
         }
         public IEnumerable<SyntaxNode> GetChildren()
         {
-            var properties = GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            var properties = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (var property in properties)
             {
                 if (typeof(SyntaxNode).IsAssignableFrom(property.PropertyType))

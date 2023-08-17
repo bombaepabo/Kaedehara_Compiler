@@ -6,7 +6,10 @@ internal enum BoundNodeKind
     LiteralExpression,
     BinaryExpression,
     VariableExpression,
-    AssignmentExpression
+    AssignmentExpression,
+    BlockStatement,
+    ExpressionStatement,
+    VariableDeclaration
 }
 
 

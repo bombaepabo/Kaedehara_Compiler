@@ -13,7 +13,7 @@ namespace kdhc
             var ShowTree = false;
             var variables = new Dictionary<VariableSymbol, object>();
             var textBuilder = new StringBuilder();
-            Compilation previous = null ;
+            Compilation previous = null;
 
             while (true)
             {
@@ -36,26 +36,23 @@ namespace kdhc
                     {
                         break;
                     }
-
-                    if (string.IsNullOrEmpty(input))
-                    {
-                        return;
-                    }
                     if (input == "#ShowTree")
                     {
                         ShowTree = !ShowTree;
                         Console.WriteLine(ShowTree ? " Showing parse trees." : "Not showing parse trees");
                         continue;
                     }
-                    else if (input == "#cls")
+                    else if (input == "#clear")
                     {
                         Console.Clear();
                         continue;
                     }
-                }
-                else
-                {
-
+                    else if (input == "#reset")
+                    {
+                        previous = null;
+                        variables.Clear();
+                        continue;
+                    }
                 }
                 textBuilder.AppendLine(input);
                 var text = textBuilder.ToString();
@@ -64,19 +61,16 @@ namespace kdhc
                 {
                     continue;
                 }
-                var compilation =   previous ==null ?
+                var compilation = previous == null ?
                                     new Compilation(syntaxTree)
-                                    :previous.ContinuedWith(syntaxTree);
+                                    : previous.ContinuedWith(syntaxTree);
                 var result = compilation.Evaluate(variables);
-                var diagnostics = result.Diagnostics;
                 if (ShowTree)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
                     syntaxTree.Root.WriteTo(Console.Out);
-                    Console.ResetColor();
                 }
 
-                if (!diagnostics.Any())
+                if (!result.Diagnostics.Any())
                 {
                     Console.ForegroundColor = ConsoleColor.Magenta;
                     Console.WriteLine(result.Value);
@@ -85,28 +79,34 @@ namespace kdhc
                 }
                 else
                 {
-                    foreach (var diag in diagnostics)
+                    foreach (var diag in result.Diagnostics)
                     {
                         var lineIndex = syntaxTree.Text.GetLineIndex(diag.Span.Start);
                         var line = syntaxTree.Text.Lines[lineIndex];
                         var lineNumber = lineIndex + 1;
                         var character = diag.Span.Start - line.Start + 1;
 
+                        Console.WriteLine();
 
                         Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.Write($"({lineNumber},{character}): ");
                         Console.WriteLine(diag);
                         Console.ResetColor();
+
                         var prefixSpan = TextSpan.FromBounds(line.Start, diag.Span.Start);
                         var suffixSpan = TextSpan.FromBounds(diag.Span.End, line.End);
+
                         var prefix = syntaxTree.Text.ToString(prefixSpan);
                         var error = syntaxTree.Text.ToString(diag.Span);
                         var suffix = syntaxTree.Text.ToString(suffixSpan);
+
                         Console.Write("    ");
                         Console.Write(prefix);
+
                         Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.Write(error);
                         Console.ResetColor();
+
                         Console.Write(suffix);
                         Console.WriteLine();
                     }

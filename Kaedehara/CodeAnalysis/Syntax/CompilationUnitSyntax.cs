@@ -2,13 +2,13 @@ namespace Kaedehara.CodeAnalysis.Syntax
 {
     public sealed class CompilationUnitSyntax : SyntaxNode
     {
-        public CompilationUnitSyntax(ExpressionSyntax expression, SyntaxToken endofFileToken)
+        public CompilationUnitSyntax(StatementSyntax statement, SyntaxToken endofFileToken)
         {
-            Expression = expression;
+            Statement = statement;
             EndofFileToken = endofFileToken;
         }
         public override SyntaxKind Kind => SyntaxKind.CompilationUnit;
-        public ExpressionSyntax Expression { get; }
+        public StatementSyntax Statement { get; }
         public SyntaxToken EndofFileToken { get; }
 
     }

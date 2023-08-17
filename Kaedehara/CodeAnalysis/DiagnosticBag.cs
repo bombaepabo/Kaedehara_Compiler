@@ -61,9 +61,21 @@ namespace Kaedehara.CodeAnalysis
             Report(span, message);
         }
 
-        public void ReportVariableAlreadyDeclared(TextSpan span, string name)
+        internal void ReportCannotConvert(TextSpan span, Type fromType, Type toType)
         {
-             var message = $"Variables'{name}' is already declared";
+             var message = $"cannot convert type'{fromType}' to '{toType}'.";
+            Report(span, message);
+        }
+
+        internal void ReportVariableAlreadyDeclared(TextSpan span, string name)
+        {
+            var message = $"Variable'{name}' is already declared.";
+            Report(span, message);
+        }
+
+        internal void ReportCannotAssign(TextSpan span, string name)
+        {
+            var message = $"Variable'{name}' is read-only and cannot be assigned to.";
             Report(span, message);
         }
     }

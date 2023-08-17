@@ -27,7 +27,14 @@ namespace Kaedehara.CodeAnalysis.Syntax
         NameExpression,
         AssignmentExpression,
         EqualsToken,
-        CompilationUnit
+        CompilationUnit,
+        BlockStatement,
+        ExpressionStatement,
+        OpenBraceToken,
+        CloseBraceToken,
+        VariableDeclaration,
+        LetKeyword,
+        VarKeyword
     }
 
 

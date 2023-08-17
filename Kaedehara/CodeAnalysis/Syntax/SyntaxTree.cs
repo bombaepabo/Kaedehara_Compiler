@@ -5,7 +5,7 @@ namespace Kaedehara.CodeAnalysis.Syntax
 {
     public sealed class SyntaxTree
     {
-        public SyntaxTree(SourceText text)
+        private SyntaxTree(SourceText text)
         {
              var parser = new Parser(text);
             var root =  parser.ParseCompilationUnit();

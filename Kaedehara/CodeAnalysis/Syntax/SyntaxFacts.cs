@@ -62,8 +62,12 @@ namespace Kaedehara.CodeAnalysis.Syntax
             {
                 case "true":
                     return SyntaxKind.TrueKeyword;
+                case "let":
+                    return SyntaxKind.LetKeyword;
                 case "false":
                     return SyntaxKind.FalseKeyword;
+                case "var":
+                    return SyntaxKind.VarKeyword;
                 default:
                     return SyntaxKind.IdentifierToken;
             }
@@ -87,18 +91,26 @@ namespace Kaedehara.CodeAnalysis.Syntax
                     return "&&" ; 
                 case SyntaxKind.PipeToken:
                     return "||" ; 
-                 case SyntaxKind.EqualEqualToken:
+                case SyntaxKind.EqualEqualToken:
                     return "==" ; 
-                 case SyntaxKind.NotEqualToken:
+                case SyntaxKind.NotEqualToken:
                     return "!=" ; 
-                 case SyntaxKind.OpenParenthesisToken:
+                case SyntaxKind.OpenParenthesisToken:
                     return "(" ; 
-                 case SyntaxKind.CloseParenthesisToken:
+                case SyntaxKind.CloseParenthesisToken:
                     return ")" ; 
-                 case SyntaxKind.FalseKeyword:
+                case SyntaxKind.OpenBraceToken:
+                    return "{" ; 
+                case SyntaxKind.CloseBraceToken:
+                    return "}" ; 
+                case SyntaxKind.FalseKeyword:
                     return "false" ; 
-                 case SyntaxKind.TrueKeyword:
+                case SyntaxKind.TrueKeyword:
                     return "true" ;     
+                case SyntaxKind.LetKeyword:
+                    return "let" ;
+                case SyntaxKind.VarKeyword:
+                    return "var" ;
                 default:
                     return null ; 
             }
