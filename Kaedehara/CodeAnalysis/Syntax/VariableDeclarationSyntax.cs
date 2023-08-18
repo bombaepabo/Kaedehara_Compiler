@@ -1,8 +1,9 @@
 namespace Kaedehara.CodeAnalysis.Syntax
 {
-    public sealed class VariableDeclararionSyntax : StatementSyntax
+    public sealed class VariableDeclarationSyntax : StatementSyntax
     {
-        public VariableDeclararionSyntax(SyntaxToken keyword,SyntaxToken identifer,SyntaxToken equalsToken,ExpressionSyntax initializer){
+        public VariableDeclarationSyntax(SyntaxToken keyword, SyntaxToken identifer, SyntaxToken equalsToken, ExpressionSyntax initializer)
+        {
             Keyword = keyword;
             Identifer = identifer;
             EqualsToken = equalsToken;
@@ -15,4 +16,4 @@ namespace Kaedehara.CodeAnalysis.Syntax
         public SyntaxToken EqualsToken { get; }
         public ExpressionSyntax Initializer { get; }
     }
-} 
+}

@@ -6,7 +6,7 @@ namespace Kaedehara.CodeAnalysis.Binding
 {
     internal sealed class Binder
     {
-        private readonly DiagnosticBag _diagnostics = new();
+        private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
         private BoundScope _scope;
 
         public Binder(BoundScope parent)
@@ -59,27 +59,28 @@ namespace Kaedehara.CodeAnalysis.Binding
             {
                 case SyntaxKind.BlockStatement:
                     return BindBlockStatement((BlockStatementSyntax)syntax);
+                case SyntaxKind.VariableDeclaration:
+                    return BindVariableDeclaration((VariableDeclarationSyntax)syntax);
                 case SyntaxKind.ExpressionStatement:
                     return BindExpressionStatement((ExpressionStatementSyntax)syntax);
-                case SyntaxKind.VariableDeclaration:
-                    return BindVariableDeclaration((VariableDeclararionSyntax)syntax);
-             
+
                 default:
                     throw new Exception($"unexpected syntax {syntax.Kind}");
             }
         }
 
-        private BoundStatement BindVariableDeclaration(VariableDeclararionSyntax syntax)
+        private BoundStatement BindVariableDeclaration(VariableDeclarationSyntax syntax)
         {
-            var name = syntax.Identifer.Text ;
+            var name = syntax.Identifer.Text;
             var isReadOnly = syntax.Keyword.Kind == SyntaxKind.LetKeyword;
             var initializer = BindExpression(syntax.Initializer);
-            var variable = new VariableSymbol(name,isReadOnly,initializer.type);
-            if(!_scope.TryDeclare(variable)){
-                _diagnostics.ReportVariableAlreadyDeclared(syntax.Identifer.Span,name);
+            var variable = new VariableSymbol(name, isReadOnly, initializer.type);
+            if (!_scope.TryDeclare(variable))
+            {
+                _diagnostics.ReportVariableAlreadyDeclared(syntax.Identifer.Span, name);
 
             }
-            return new BoundVariableDeclaration(variable,initializer);
+            return new BoundVariableDeclaration(variable, initializer);
         }
 
         private BoundStatement BindExpressionStatement(ExpressionStatementSyntax syntax)
@@ -92,9 +93,10 @@ namespace Kaedehara.CodeAnalysis.Binding
         {
             var statements = ImmutableArray.CreateBuilder<BoundStatement>();
             _scope = new BoundScope(_scope);
-            foreach (var statementSyntax in syntax.Statements){
-                    var statement = BindStatement(statementSyntax);
-                    statements.Add(statement);
+            foreach (var statementSyntax in syntax.Statements)
+            {
+                var statement = BindStatement(statementSyntax);
+                statements.Add(statement);
             }
             _scope = _scope.Parent;
             return new BoundBlockStatement(statements.ToImmutable());
@@ -139,12 +141,13 @@ namespace Kaedehara.CodeAnalysis.Binding
             var boundExpression = BindExpression(syntax.Expression);
             if (!_scope.TryLookup(name, out var variable))
             {
-                 _diagnostics.ReportUndefinedName(syntax.IdentifierToken.span, name);
+                _diagnostics.ReportUndefinedName(syntax.IdentifierToken.span, name);
                 return boundExpression;
 
             }
-            if(variable.IsReadOnly){
-                _diagnostics.ReportCannotAssign(syntax.EqualToken.span,name);
+            if (variable.IsReadOnly)
+            {
+                _diagnostics.ReportCannotAssign(syntax.EqualToken.span, name);
             }
             if (boundExpression.type != variable.Type)
             {

@@ -7,8 +7,8 @@ namespace Kaedehara.CodeAnalysis.Syntax
     {
         private SyntaxTree(SourceText text)
         {
-             var parser = new Parser(text);
-            var root =  parser.ParseCompilationUnit();
+            var parser = new Parser(text);
+            var root = parser.ParseCompilationUnit();
             var diagnostics = parser.Diagnostics.ToImmutableArray();
 
             Text = text;
@@ -27,14 +27,14 @@ namespace Kaedehara.CodeAnalysis.Syntax
         }
         public static SyntaxTree Parse(SourceText text)
         {
-           return new SyntaxTree(text);
+            return new SyntaxTree(text);
         }
-         public static IEnumerable<SyntaxToken> ParseToken(string text)
+        public static IEnumerable<SyntaxToken> ParseToken(string text)
         {
             var sourceText = SourceText.From(text);
             return ParseToken(sourceText);
         }
-        
+
         public static IEnumerable<SyntaxToken> ParseToken(SourceText text)
         {
             var lexer = new Lexer(text);
