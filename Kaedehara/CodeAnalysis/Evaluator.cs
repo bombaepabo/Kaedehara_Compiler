@@ -7,8 +7,8 @@ namespace Kaedehara.CodeAnalysis
 {
     internal sealed class Evaluator
     {
-        private readonly Dictionary<VariableSymbol, object> _variables;
         private readonly BoundStatement _root;
+        private readonly Dictionary<VariableSymbol, object> _variables;
         private object _lastValue ;
 
         public Evaluator(BoundStatement root, Dictionary<VariableSymbol, object> variables)

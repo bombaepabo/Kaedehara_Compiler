@@ -9,11 +9,11 @@ namespace Kaedehara.CodeAnalysis.Syntax
             CloseParenthesisToken = closeParenthesisToken;
         }
 
+        public override SyntaxKind Kind => SyntaxKind.ParenthesizedExpression;
         public SyntaxToken OpenParenthesisToken { get; }
         public ExpressionSyntax Expression { get; }
         public SyntaxToken CloseParenthesisToken { get; }
 
-        public override SyntaxKind Kind => SyntaxKind.ParenthesizedExpression;
     }
 
 

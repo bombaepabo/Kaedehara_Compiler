@@ -6,8 +6,8 @@ namespace Kaedehara.CodeAnalysis.Syntax
             Expression = expression;
         }
 
+        public override SyntaxKind Kind => SyntaxKind.ExpressionStatement;
         public ExpressionSyntax Expression { get; }
 
-        public override SyntaxKind Kind => SyntaxKind.ExpressionStatement;
     }
 } 

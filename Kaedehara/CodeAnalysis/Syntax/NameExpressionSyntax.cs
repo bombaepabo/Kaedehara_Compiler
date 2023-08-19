@@ -7,8 +7,8 @@ namespace Kaedehara.CodeAnalysis.Syntax
             IdentifierToken = identifierToken;
         }
 
-        public SyntaxToken IdentifierToken { get; }
         public override SyntaxKind Kind => SyntaxKind.NameExpression;
+        public SyntaxToken IdentifierToken { get; }
 
     }
 

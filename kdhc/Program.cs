@@ -61,8 +61,8 @@ namespace kdhc
                 {
                     continue;
                 }
-                var compilation = previous == null ?
-                                    new Compilation(syntaxTree)
+                var compilation = previous == null 
+                                    ? new Compilation(syntaxTree)
                                     : previous.ContinuedWith(syntaxTree);
                 var result = compilation.Evaluate(variables);
                 if (ShowTree)

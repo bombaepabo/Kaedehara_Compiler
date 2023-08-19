@@ -15,7 +15,7 @@ namespace Kaedehara.CodeAnalysis.Syntax
         public int Position { get; }
         public string Text { get; }
         public Object Value { get; }
-        public TextSpan span => new TextSpan(Position, Text?.Length ?? 0);
+        public override TextSpan Span => new TextSpan(Position, Text?.Length ?? 0);
 
     }
 

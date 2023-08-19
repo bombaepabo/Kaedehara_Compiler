@@ -10,7 +10,6 @@ namespace Kaedehara.CodeAnalysis.Syntax
             var parser = new Parser(text);
             var root = parser.ParseCompilationUnit();
             var diagnostics = parser.Diagnostics.ToImmutableArray();
-
             Text = text;
             Diagnostics = diagnostics;
             Root = root;

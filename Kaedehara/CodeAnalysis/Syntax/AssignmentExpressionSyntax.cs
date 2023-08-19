@@ -7,12 +7,12 @@ namespace Kaedehara.CodeAnalysis.Syntax
         public AssignmentExpressionSyntax(SyntaxToken identifierToken, SyntaxToken equalToken, ExpressionSyntax expression)
         {
             IdentifierToken = identifierToken;
-            EqualToken = equalToken;
+            EqualsToken = equalToken;
             Expression = expression;
         }
 
         public SyntaxToken IdentifierToken { get; }
-        public SyntaxToken EqualToken { get; }
+        public SyntaxToken EqualsToken { get; }
         public ExpressionSyntax Expression { get; }
 
         public override SyntaxKind Kind => SyntaxKind.AssignmentExpression;

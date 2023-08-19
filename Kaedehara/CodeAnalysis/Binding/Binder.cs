@@ -1,5 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Security;
+using System.Linq;
 using Kaedehara.CodeAnalysis.Syntax;
 
 namespace Kaedehara.CodeAnalysis.Binding
@@ -69,6 +71,19 @@ namespace Kaedehara.CodeAnalysis.Binding
             }
         }
 
+        private BoundStatement BindBlockStatement(BlockStatementSyntax syntax)
+        {
+            var statements = ImmutableArray.CreateBuilder<BoundStatement>();
+            _scope = new BoundScope(_scope);
+            foreach (var statementSyntax in syntax.Statements)
+            {
+                var statement = BindStatement(statementSyntax);
+                statements.Add(statement);
+            }
+            _scope = _scope.Parent;
+            return new BoundBlockStatement(statements.ToImmutable());
+
+        }
         private BoundStatement BindVariableDeclaration(VariableDeclarationSyntax syntax)
         {
             var name = syntax.Identifer.Text;
@@ -89,19 +104,6 @@ namespace Kaedehara.CodeAnalysis.Binding
             return new BoundExpressionStatement(expression);
         }
 
-        private BoundStatement BindBlockStatement(BlockStatementSyntax syntax)
-        {
-            var statements = ImmutableArray.CreateBuilder<BoundStatement>();
-            _scope = new BoundScope(_scope);
-            foreach (var statementSyntax in syntax.Statements)
-            {
-                var statement = BindStatement(statementSyntax);
-                statements.Add(statement);
-            }
-            _scope = _scope.Parent;
-            return new BoundBlockStatement(statements.ToImmutable());
-
-        }
 
         public BoundExpression BindExpression(ExpressionSyntax syntax)
         {
@@ -130,7 +132,7 @@ namespace Kaedehara.CodeAnalysis.Binding
             var name = syntax.IdentifierToken.Text;
             if (!_scope.TryLookup(name, out var variable))
             {
-                _diagnostics.ReportUndefinedName(syntax.IdentifierToken.span, name);
+                _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
                 return new BoundLiteralExpression(0);
             }
             return new BoundVariableExpression(variable);
@@ -141,13 +143,13 @@ namespace Kaedehara.CodeAnalysis.Binding
             var boundExpression = BindExpression(syntax.Expression);
             if (!_scope.TryLookup(name, out var variable))
             {
-                _diagnostics.ReportUndefinedName(syntax.IdentifierToken.span, name);
+                _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
                 return boundExpression;
 
             }
             if (variable.IsReadOnly)
             {
-                _diagnostics.ReportCannotAssign(syntax.EqualToken.span, name);
+                _diagnostics.ReportCannotAssign(syntax.EqualsToken.Span, name);
             }
             if (boundExpression.type != variable.Type)
             {
@@ -169,7 +171,7 @@ namespace Kaedehara.CodeAnalysis.Binding
             var boundOperator = BoundUnaryOperator.Bind(syntax.Operatortoken.Kind, boundOperand.type);
             if (boundOperator == null)
             {
-                _diagnostics.ReportUndefinedUnaryOperator(syntax.Operatortoken.span, syntax.Operatortoken.Text, boundOperand.type);
+                _diagnostics.ReportUndefinedUnaryOperator(syntax.Operatortoken.Span, syntax.Operatortoken.Text, boundOperand.type);
                 return boundOperand;
             }
             return new BoundUnaryExpression(boundOperator, boundOperand);
@@ -183,7 +185,7 @@ namespace Kaedehara.CodeAnalysis.Binding
             var boundOperator = BoundBinaryOperator.Bind(syntax.Operatortoken.Kind, boundLeft.type, boundRight.type);
             if (boundOperator == null)
             {
-                _diagnostics.ReportUndefinedBinaryOperator(syntax.Operatortoken.span, syntax.Operatortoken.Text, boundLeft.type, boundRight.type);
+                _diagnostics.ReportUndefinedBinaryOperator(syntax.Operatortoken.Span, syntax.Operatortoken.Text, boundLeft.type, boundRight.type);
                 return boundLeft;
             }
             return new BoundBinaryExpression(boundLeft, boundOperator, boundRight);

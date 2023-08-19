@@ -4,11 +4,11 @@ namespace Kaedehara.CodeAnalysis.Syntax
 {
     internal sealed class Lexer
     {
-        private SourceText _text;
-        private int _position;
+        private readonly SourceText _text;
         private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
-        private SyntaxKind _kind;
         private int _start;
+        private int _position;
+        private SyntaxKind _kind;
         private object _value;
         public Lexer(SourceText text)
         {

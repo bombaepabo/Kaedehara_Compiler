@@ -1,35 +1,48 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Xml.Schema;
-using Kaedehara.CodeAnalysis.Syntax;
 using Kaedehara.CodeAnalysis.Text;
 
 namespace Kaedehara.CodeAnalysis.Syntax
 {
     internal sealed class Parser
     {
-        private readonly ImmutableArray<SyntaxToken> _tokens;
-        private readonly DiagnosticBag _diagnostics = new();
+        private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
         private readonly SourceText _text;
+        private readonly ImmutableArray<SyntaxToken> _tokens;
         private int _position;
 
         public Parser(SourceText text)
         {
             var tokens = new List<SyntaxToken>();
+
             var lexer = new Lexer(text);
             SyntaxToken token;
             do
             {
                 token = lexer.Lex();
-                if (token.Kind != SyntaxKind.WhitespaceToken && token.Kind != SyntaxKind.BadToken)
+                if (token.Kind != SyntaxKind.WhitespaceToken &&
+                    token.Kind != SyntaxKind.BadToken)
                 {
                     tokens.Add(token);
                 }
             } while (token.Kind != SyntaxKind.EndOfFileToken);
+
             _text = text;
             _tokens = tokens.ToImmutableArray();
             _diagnostics.AddRange(lexer.Diagonostics);
         }
         public DiagnosticBag Diagnostics => _diagnostics;
+        private SyntaxToken Peek(int offset)
+        {
+            var index = _position + offset;
+            if (index >= _tokens.Length)
+            {
+                return _tokens[_tokens.Length - 1];
+
+            }
+            return _tokens[index];
+        }
         private SyntaxToken Current => Peek(0);
         private SyntaxToken NextToken()
         {
@@ -43,18 +56,8 @@ namespace Kaedehara.CodeAnalysis.Syntax
             {
                 return NextToken();
             }
-            _diagnostics.ReportUnexpectedToken(Current.span, Current.Kind, kind);
+            _diagnostics.ReportUnexpectedToken(Current.Span, Current.Kind, kind);
             return new SyntaxToken(kind, Current.Position, null, null);
-        }
-        private SyntaxToken Peek(int offset)
-        {
-            var index = _position + offset;
-            if (index >= _tokens.Length)
-            {
-                return _tokens[_tokens.Length - 1];
-
-            }
-            return _tokens[index];
         }
         public CompilationUnitSyntax ParseCompilationUnit()
         {
@@ -76,6 +79,21 @@ namespace Kaedehara.CodeAnalysis.Syntax
             }
         }
 
+        private BlockStatementSyntax ParseBlockStatement()
+        {
+            var statements = ImmutableArray.CreateBuilder<StatementSyntax>();
+            var openBraceToken = MatchToken(SyntaxKind.OpenBraceToken);
+            while (Current.Kind != SyntaxKind.EndOfFileToken &&
+                  Current.Kind != SyntaxKind.CloseBraceToken)
+            {
+                var statement = ParseStatement();
+                statements.Add(statement);
+            }
+
+            var closeBraceToken = MatchToken(SyntaxKind.CloseBraceToken);
+            return new BlockStatementSyntax(openBraceToken, statements.ToImmutable(), closeBraceToken);
+
+        }
         private StatementSyntax ParseVariableDeclaration()
         {
             var expected = Current.Kind == SyntaxKind.LetKeyword ? SyntaxKind.LetKeyword : SyntaxKind.VarKeyword;
@@ -92,21 +110,6 @@ namespace Kaedehara.CodeAnalysis.Syntax
             return new ExpressionStatementSyntax(expression);
         }
 
-        private BlockStatementSyntax ParseBlockStatement()
-        {
-            var statements = ImmutableArray.CreateBuilder<StatementSyntax>();
-            var openBraceToken = MatchToken(SyntaxKind.OpenBraceToken);
-            while (Current.Kind != SyntaxKind.EndOfFileToken &&
-                  Current.Kind != SyntaxKind.CloseBraceToken)
-            {
-                var statement = ParseStatement();
-                statements.Add(statement);
-            }
-
-            var closeBraceToken = MatchToken(SyntaxKind.CloseBraceToken);
-            return new BlockStatementSyntax(openBraceToken, statements.ToImmutable(), closeBraceToken);
-
-        }
 
         private ExpressionSyntax ParseExpression()
         {
@@ -145,9 +148,7 @@ namespace Kaedehara.CodeAnalysis.Syntax
             {
                 var precedence = Current.Kind.GetBinaryOperatorPrecedence();
                 if (precedence == 0 || precedence <= parentPrecedence)
-                {
                     break;
-                }
                 var operatorToken = NextToken();
                 var right = ParseBinaryExpression(precedence);
                 left = new BinaryExpressionSyntax(left, operatorToken, right);
