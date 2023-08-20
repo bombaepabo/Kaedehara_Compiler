@@ -60,7 +60,7 @@ internal sealed class AnnotatedText
 
         using (var reader = new StringReader(text))
         {
-            string line;
+            string? line;
             while ((line = reader.ReadLine()) != null)
             {
                 lines.Add(line);
@@ -95,7 +95,7 @@ internal sealed class AnnotatedText
         }
         while (lines.Count > 0 && lines[lines.Count - 1].Length == 0)
         {
-            lines.RemoveAt(0);
+            lines.RemoveAt(lines.Count - 1);
         }
         return lines.ToArray();
     }

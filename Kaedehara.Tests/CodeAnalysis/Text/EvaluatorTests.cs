@@ -30,14 +30,20 @@ public class EvaluatorTests
     [InlineData("{var a = 0 (a = 10) * a}", 100)]
     public void SyntaxFacts_GetText_RoundTrips(string text, object expectedValue)
     {
+        AssertValue(text, expectedValue);
+
+    }
+
+    private static void AssertValue(string text, object expectedValue)
+    {
         var syntaxTree = SyntaxTree.Parse(text);
         var compilation = new Compilation(syntaxTree);
         var variables = new Dictionary<VariableSymbol, object>();
         var result = compilation.Evaluate(variables);
         Assert.Empty(result.Diagnostics);
         Assert.Equal(expectedValue, result.Value);
-
     }
+
     [Fact]
     public void Evaluator_VariableDeclaration_Reports_Redeclaration()
     {
@@ -57,6 +63,71 @@ public class EvaluatorTests
 
         AssertDiagnostics(text, diagnostics);
     }
+     [Fact]
+    public void Evaluator_Name_Reports_Undefined()
+    {
+        var text = @"[x] * 10";
+        var diagnostics = @"
+            Variables 'x' doesn't exist.
+        ";
+
+        AssertDiagnostics(text, diagnostics);
+    }
+    [Fact]
+    public void Evaluator_Assignment_Reports_CannotAssign()
+    {
+        var text = @"
+        {
+            let x = 10 
+            x [=] 0
+        }
+        
+        ";
+        var diagnostics = @"
+            Variable 'x' is read-only and cannot be assigned to.
+        ";
+
+        AssertDiagnostics(text, diagnostics);
+    }
+     [Fact]
+    public void Evaluator_Assignment_Reports_CannotConvert()
+    {
+        var text = @"
+        {
+            var x = 10 
+            x = [true]
+        }
+        
+        ";
+        var diagnostics = @"
+            Cannot convert type 'System.Boolean' to 'System.Int32'.
+        ";
+
+        AssertDiagnostics(text, diagnostics);
+    }
+
+     [Fact]
+    public void Evaluator_Unary_Reports_Undefined()
+    {
+        var text = @"[+]true";
+        var diagnostics = @"
+            Unary operator '+' is not defined for type 'System.Boolean'.
+        ";
+
+        AssertDiagnostics(text, diagnostics);
+    }
+    [Fact]
+    public void Evaluator_Binary_Reports_Undefined()
+    {
+        var text = @"10 [*] false";
+        var diagnostics = @"
+            Binary operator '*' is not defined for types 'System.Int32' and 'System.Boolean'.
+        ";
+
+        AssertDiagnostics(text, diagnostics);
+    }
+    
+
     private void AssertDiagnostics(string text, string diagnosticText)
     {
         var annotatedText = AnnotatedText.Parse(text);
