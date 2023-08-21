@@ -35,10 +35,17 @@ internal sealed class BoundBinaryOperator
             new BoundBinaryOperator(SyntaxKind.MinusToken,BoundBinaryOperatorKind.Subtraction,typeof(int)),
             new BoundBinaryOperator(SyntaxKind.StarToken,BoundBinaryOperatorKind.Multiplication,typeof(int)),
             new BoundBinaryOperator(SyntaxKind.SlashToken,BoundBinaryOperatorKind.Division,typeof(int)),
-            new BoundBinaryOperator(SyntaxKind.AmpersanToken,BoundBinaryOperatorKind.LogicalAnd,typeof(bool)),
-            new BoundBinaryOperator(SyntaxKind.PipeToken,BoundBinaryOperatorKind.LogicalOr,typeof(bool)),
             new BoundBinaryOperator(SyntaxKind.EqualEqualToken,BoundBinaryOperatorKind.Equals,typeof(int),typeof(bool)),
             new BoundBinaryOperator(SyntaxKind.NotEqualToken,BoundBinaryOperatorKind.NotEquals,typeof(int),typeof(bool)),
+
+            new BoundBinaryOperator(SyntaxKind.LessToken,BoundBinaryOperatorKind.LessThan,typeof(int),typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.LessOrEqualsToken,BoundBinaryOperatorKind.LessThanOrEqualsTo,typeof(int),typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.GreatToken,BoundBinaryOperatorKind.GreaterThan,typeof(int),typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.GreaterOrEqualsToken,BoundBinaryOperatorKind.GreaterOrEqualsTo,typeof(int),typeof(bool)),
+
+
+            new BoundBinaryOperator(SyntaxKind.AmpersanToken,BoundBinaryOperatorKind.LogicalAnd,typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.PipeToken,BoundBinaryOperatorKind.LogicalOr,typeof(bool)),
             new BoundBinaryOperator(SyntaxKind.EqualEqualToken,BoundBinaryOperatorKind.Equals,typeof(bool)),
             new BoundBinaryOperator(SyntaxKind.NotEqualToken,BoundBinaryOperatorKind.NotEquals,typeof(bool)),
 

@@ -113,6 +113,32 @@ namespace Kaedehara.CodeAnalysis.Syntax
 
                     }
                     break;
+                case '<':
+                     _position++;
+                    if (Current != '=')
+                    {
+                        _kind = SyntaxKind.LessToken;
+                    }
+                    else
+                    {
+                        _kind = SyntaxKind.LessOrEqualsToken;
+                        _position += 1;
+
+                    }
+                    break;
+                case '>':
+                    _position++;
+                    if (Current != '=')
+                    {
+                        _kind = SyntaxKind.GreatToken;
+                    }
+                    else
+                    {
+                        _kind = SyntaxKind.GreaterOrEqualsToken;
+                        _position += 1;
+
+                    }
+                    break;
                 case '0':
                 case '1':
                 case '2':

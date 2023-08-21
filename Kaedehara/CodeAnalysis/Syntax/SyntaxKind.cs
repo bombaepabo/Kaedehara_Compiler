@@ -34,7 +34,17 @@ namespace Kaedehara.CodeAnalysis.Syntax
         CloseBraceToken,
         VariableDeclaration,
         LetKeyword,
-        VarKeyword
+        VarKeyword,
+        LessToken,
+        LessOrEqualsToken,
+        GreatToken,
+        GreaterOrEqualsToken,
+        IfStatement,
+        ElseClause,
+        IfKeyword,
+        ElseKeyword,
+        WhileKeyword,
+        WhileStatement
     }
 
 

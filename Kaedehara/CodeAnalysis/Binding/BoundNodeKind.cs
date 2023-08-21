@@ -9,7 +9,9 @@ internal enum BoundNodeKind
     AssignmentExpression,
     BlockStatement,
     ExpressionStatement,
-    VariableDeclaration
+    VariableDeclaration,
+    IfStatement,
+    WhileStatement
 }
 
 

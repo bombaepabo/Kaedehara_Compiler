@@ -135,8 +135,18 @@ public class LexerTest
         }
          if(t1Kind == SyntaxKind.EqualsToken && t2Kind == SyntaxKind.EqualEqualToken){
             return true ;
-
         }
+         if(t1Kind == SyntaxKind.LessToken && t2Kind == SyntaxKind.EqualsToken){
+            return true ;
+        }if(t1Kind == SyntaxKind.LessToken && t2Kind == SyntaxKind.EqualEqualToken){
+            return true ;
+        }
+         if(t1Kind == SyntaxKind.GreatToken && t2Kind == SyntaxKind.EqualsToken){
+            return true ;
+        }if(t1Kind == SyntaxKind.GreatToken && t2Kind == SyntaxKind.EqualEqualToken){
+            return true ;
+        }
+
         return false ;
     }
     private static IEnumerable<(SyntaxKind t1Kind,string t1Text,SyntaxKind t2Kind,string t2Text)> GetTokenPairs()

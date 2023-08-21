@@ -24,13 +24,19 @@ namespace Kaedehara.CodeAnalysis.Syntax
                 if (typeof(SyntaxNode).IsAssignableFrom(property.PropertyType))
                 {
                     var child = (SyntaxNode)property.GetValue(this);
-                    yield return child;
+                    if(child != null){
+                        yield return child ; 
+                    }
                 }
                 else if (typeof(IEnumerable<SyntaxNode>).IsAssignableFrom(property.PropertyType))
                 {
                     var children = (IEnumerable<SyntaxNode>)property.GetValue(this);
-                    foreach (var child in children)                    
-                        yield return child;
+                    
+                    foreach (var child in children)    
+                         if(child != null)
+                         {
+                        yield return child ; 
+                        }            
                 }
             }
         }

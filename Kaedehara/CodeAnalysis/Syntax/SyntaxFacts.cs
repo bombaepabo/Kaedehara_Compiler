@@ -33,6 +33,10 @@ namespace Kaedehara.CodeAnalysis.Syntax
                     return 4;
                 case SyntaxKind.EqualEqualToken:
                 case SyntaxKind.NotEqualToken:
+                case SyntaxKind.LessToken:
+                case SyntaxKind.LessOrEqualsToken:
+                case SyntaxKind.GreatToken:
+                case SyntaxKind.GreaterOrEqualsToken:
                     return 3;
                 case SyntaxKind.AmpersanToken:
                     return 2;
@@ -62,12 +66,18 @@ namespace Kaedehara.CodeAnalysis.Syntax
             {
                 case "true":
                     return SyntaxKind.TrueKeyword;
+                case "if":
+                    return SyntaxKind.IfKeyword;
+                case "else":
+                    return SyntaxKind.ElseKeyword;
                 case "let":
                     return SyntaxKind.LetKeyword;
                 case "false":
                     return SyntaxKind.FalseKeyword;
                 case "var":
                     return SyntaxKind.VarKeyword;
+                case "while":
+                    return SyntaxKind.WhileKeyword;
                 default:
                     return SyntaxKind.IdentifierToken;
             }
@@ -87,6 +97,14 @@ namespace Kaedehara.CodeAnalysis.Syntax
                     return "!" ; 
                 case SyntaxKind.EqualsToken:
                     return "=" ; 
+                case SyntaxKind.LessToken:
+                    return "<" ; 
+                case SyntaxKind.LessOrEqualsToken:
+                    return "<=" ; 
+                case SyntaxKind.GreatToken:
+                    return ">" ; 
+                case SyntaxKind.GreaterOrEqualsToken:
+                    return ">=" ; 
                 case SyntaxKind.AmpersanToken:
                     return "&&" ; 
                 case SyntaxKind.PipeToken:
@@ -111,6 +129,12 @@ namespace Kaedehara.CodeAnalysis.Syntax
                     return "let" ;
                 case SyntaxKind.VarKeyword:
                     return "var" ;
+                case SyntaxKind.ElseKeyword:
+                    return "else" ;
+                case SyntaxKind.IfKeyword:
+                    return "if" ;
+                case SyntaxKind.WhileKeyword:
+                    return "while" ;
                 default:
                     return null ; 
             }

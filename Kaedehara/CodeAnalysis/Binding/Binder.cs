@@ -63,12 +63,38 @@ namespace Kaedehara.CodeAnalysis.Binding
                     return BindBlockStatement((BlockStatementSyntax)syntax);
                 case SyntaxKind.VariableDeclaration:
                     return BindVariableDeclaration((VariableDeclarationSyntax)syntax);
+                case SyntaxKind.IfStatement:
+                    return BindIfStatement((IfStatementSyntax)syntax);
+                case SyntaxKind.WhileStatement:
+                    return BindWhileStatement((WhileStatementSyntax)syntax);
                 case SyntaxKind.ExpressionStatement:
                     return BindExpressionStatement((ExpressionStatementSyntax)syntax);
 
                 default:
                     throw new Exception($"unexpected syntax {syntax.Kind}");
             }
+        }
+
+        private BoundStatement BindWhileStatement(WhileStatementSyntax syntax)
+        {
+            var condition = BindExpression(syntax.Condition,typeof(bool));
+            var body = BindStatement(syntax.Body);
+            return new BoundWhileStatement(condition,body);
+        }
+
+        private BoundStatement BindIfStatement(IfStatementSyntax syntax)
+        {
+           var condition  = BindExpression(syntax.Condition,typeof(bool));
+           var thenStatement = BindStatement(syntax.ThenStatement);
+           var elseStatement = syntax.ElseClause == null ? null : BindStatement(syntax.ElseClause.ElseStatement);
+           return new BoundIfStatement(condition,thenStatement,elseStatement);
+        }
+        private BoundExpression BindExpression(ExpressionSyntax syntax,Type targetType){
+            var result = BindExpression(syntax);
+            if(result.type != targetType){
+                _diagnostics.ReportCannotConvert(syntax.Span,result.type,targetType);
+            }
+            return result;
         }
 
         private BoundStatement BindBlockStatement(BlockStatementSyntax syntax)
