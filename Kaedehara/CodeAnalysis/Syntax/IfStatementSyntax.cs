@@ -15,4 +15,5 @@ namespace Kaedehara.CodeAnalysis.Syntax
         public ElseClauseSyntax ElseClause { get; }
         public override SyntaxKind Kind => SyntaxKind.IfStatement;
     }
+
 } 

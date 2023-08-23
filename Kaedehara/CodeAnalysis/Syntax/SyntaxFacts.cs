@@ -74,10 +74,14 @@ namespace Kaedehara.CodeAnalysis.Syntax
                     return SyntaxKind.LetKeyword;
                 case "false":
                     return SyntaxKind.FalseKeyword;
+                case "for":
+                    return SyntaxKind.ForKeyword;
                 case "var":
                     return SyntaxKind.VarKeyword;
                 case "while":
                     return SyntaxKind.WhileKeyword;
+                case "to":
+                    return SyntaxKind.ToKeyword;
                 default:
                     return SyntaxKind.IdentifierToken;
             }
@@ -135,6 +139,10 @@ namespace Kaedehara.CodeAnalysis.Syntax
                     return "if" ;
                 case SyntaxKind.WhileKeyword:
                     return "while" ;
+                case SyntaxKind.ForKeyword:
+                    return "for" ; 
+                case SyntaxKind.ToKeyword:
+                    return "to" ; 
                 default:
                     return null ; 
             }

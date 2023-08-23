@@ -39,12 +39,29 @@ namespace Kaedehara.CodeAnalysis
                 case BoundNodeKind.WhileStatement:
                      EvaluateWhileStatement((BoundWhileStatement)node);
                     break;
+                case BoundNodeKind.ForStatement:
+                     EvaluateForStatement((BoundForStatement)node);
+                    break;
                 case BoundNodeKind.ExpressionStatement:
                      EvaluateExpressionStatement((BoundExpressionStatement)node);
                     break;
                 default:
                     throw new Exception($"unexpected node {node.Kind}");
             }
+        }
+
+        private void EvaluateForStatement(BoundForStatement node)
+        {
+            var lowerbound = (int)EvaluateExpression(node.LowerBound);
+            var upperbound = (int)EvaluateExpression(node.UpperBound);
+
+            for(var i = lowerbound; i <= upperbound;i++)
+            {
+            _variables[node.Variable] = i;
+            EvaluateStatement(node.Body);
+            }
+            
+
         }
 
         private void EvaluateWhileStatement(BoundWhileStatement node)

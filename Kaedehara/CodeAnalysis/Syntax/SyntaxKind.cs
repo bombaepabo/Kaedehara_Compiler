@@ -44,7 +44,10 @@ namespace Kaedehara.CodeAnalysis.Syntax
         IfKeyword,
         ElseKeyword,
         WhileKeyword,
-        WhileStatement
+        WhileStatement,
+        ForKeyword,
+        ForStatement,
+        ToKeyword
     }
 
 

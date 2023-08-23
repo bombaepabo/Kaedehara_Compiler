@@ -79,11 +79,24 @@ namespace Kaedehara.CodeAnalysis.Syntax
                     return ParseIfStatement();
                 case SyntaxKind.WhileKeyword:
                     return ParseWhileStatement();
+                case SyntaxKind.ForKeyword:
+                    return ParseForStatement();
                 default:
                     return ParseExpressionStatement();
             }
         }
 
+        private StatementSyntax ParseForStatement()
+        {
+             var keyword = MatchToken(SyntaxKind.ForKeyword);
+             var identifier = MatchToken(SyntaxKind.IdentifierToken);
+             var equalsToken = MatchToken(SyntaxKind.EqualsToken);
+             var lowerbound = ParseExpression();
+             var toKeyword = MatchToken(SyntaxKind.ToKeyword);
+             var upperbound = ParseExpression();
+             var body = ParseStatement();
+            return new ForStatementSyntax(keyword,identifier,equalsToken,lowerbound,toKeyword,upperbound,body);
+        }
         private StatementSyntax ParseWhileStatement()
         {
             var keyword = MatchToken(SyntaxKind.WhileKeyword);
@@ -118,8 +131,13 @@ namespace Kaedehara.CodeAnalysis.Syntax
             while (Current.Kind != SyntaxKind.EndOfFileToken &&
                   Current.Kind != SyntaxKind.CloseBraceToken)
             {
+                var startToken = Current;
                 var statement = ParseStatement();
                 statements.Add(statement);
+
+                if(Current == startToken){
+                    NextToken();
+                }
             }
 
             var closeBraceToken = MatchToken(SyntaxKind.CloseBraceToken);
