@@ -47,7 +47,7 @@ namespace kdhc
                     else if (input == "#ShowProgram")
                     {
                         ShowProgram = !ShowProgram;
-                        Console.WriteLine(ShowTree ? " Showing bound trees." : "Not showing bound trees.");
+                        Console.WriteLine(ShowProgram ? " Showing bound trees." : "Not showing bound trees.");
                         continue;
                     }
                     else if (input == "#clear")
