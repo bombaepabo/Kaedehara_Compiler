@@ -2,22 +2,28 @@ namespace Kaedehara.CodeAnalysis.Syntax
 {
     public static class SyntaxFacts
     {
-        public static IEnumerable<SyntaxKind> GetBinaryOperatorKinds(){
-                var kinds = (SyntaxKind[]) Enum.GetValues(typeof(SyntaxKind));
-                foreach(var kind in kinds){
-                    if(GetBinaryOperatorPrecedence(kind) >0){
-                        yield return kind ;
-                    }
+        public static IEnumerable<SyntaxKind> GetBinaryOperatorKinds()
+        {
+            var kinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
+            foreach (var kind in kinds)
+            {
+                if (GetBinaryOperatorPrecedence(kind) > 0)
+                {
+                    yield return kind;
                 }
+            }
 
         }
-           public static IEnumerable<SyntaxKind> GetUnaryOperatorKinds(){
-                var kinds = (SyntaxKind[]) Enum.GetValues(typeof(SyntaxKind));
-                foreach(var kind in kinds){
-                    if(GetUnaryOperatorPrecedence(kind) >0){
-                        yield return kind ;
-                    }
+        public static IEnumerable<SyntaxKind> GetUnaryOperatorKinds()
+        {
+            var kinds = (SyntaxKind[])Enum.GetValues(typeof(SyntaxKind));
+            foreach (var kind in kinds)
+            {
+                if (GetUnaryOperatorPrecedence(kind) > 0)
+                {
+                    yield return kind;
                 }
+            }
 
         }
         public static int GetBinaryOperatorPrecedence(this SyntaxKind kind)
@@ -39,8 +45,11 @@ namespace Kaedehara.CodeAnalysis.Syntax
                 case SyntaxKind.GreaterOrEqualsToken:
                     return 3;
                 case SyntaxKind.AmpersanToken:
+                case SyntaxKind.AmpersanAmpersanToken:
                     return 2;
+                case SyntaxKind.PipePipeToken:
                 case SyntaxKind.PipeToken:
+                case SyntaxKind.HatToken:
                     return 1;
                 default:
                     return 0;
@@ -53,6 +62,7 @@ namespace Kaedehara.CodeAnalysis.Syntax
                 case SyntaxKind.PlusToken:
                 case SyntaxKind.MinusToken:
                 case SyntaxKind.BangToken:
+                case SyntaxKind.TildeToken:
                     return 6;
 
                 default:
@@ -86,67 +96,76 @@ namespace Kaedehara.CodeAnalysis.Syntax
                     return SyntaxKind.IdentifierToken;
             }
         }
-        public static string GetText(SyntaxKind kind){
-            switch(kind)
+        public static string GetText(SyntaxKind kind)
+        {
+            switch (kind)
             {
                 case SyntaxKind.PlusToken:
-                    return "+" ;
+                    return "+";
                 case SyntaxKind.MinusToken:
-                    return "-" ; 
+                    return "-";
                 case SyntaxKind.StarToken:
-                    return "*" ; 
+                    return "*";
                 case SyntaxKind.SlashToken:
-                    return "/" ; 
+                    return "/";
                 case SyntaxKind.BangToken:
-                    return "!" ; 
+                    return "!";
                 case SyntaxKind.EqualsToken:
-                    return "=" ; 
+                    return "=";
+                 case SyntaxKind.TildeToken:
+                    return "~";
                 case SyntaxKind.LessToken:
-                    return "<" ; 
+                    return "<";
                 case SyntaxKind.LessOrEqualsToken:
-                    return "<=" ; 
+                    return "<=";
                 case SyntaxKind.GreatToken:
-                    return ">" ; 
+                    return ">";
                 case SyntaxKind.GreaterOrEqualsToken:
-                    return ">=" ; 
+                    return ">=";
                 case SyntaxKind.AmpersanToken:
-                    return "&&" ; 
+                    return "&";
+                case SyntaxKind.AmpersanAmpersanToken:
+                    return "&&";
                 case SyntaxKind.PipeToken:
-                    return "||" ; 
+                    return "|";
+                case SyntaxKind.PipePipeToken:
+                    return "||";
+                 case SyntaxKind.HatToken:
+                    return "^";
                 case SyntaxKind.EqualEqualToken:
-                    return "==" ; 
+                    return "==";
                 case SyntaxKind.NotEqualToken:
-                    return "!=" ; 
+                    return "!=";
                 case SyntaxKind.OpenParenthesisToken:
-                    return "(" ; 
+                    return "(";
                 case SyntaxKind.CloseParenthesisToken:
-                    return ")" ; 
+                    return ")";
                 case SyntaxKind.OpenBraceToken:
-                    return "{" ; 
+                    return "{";
                 case SyntaxKind.CloseBraceToken:
-                    return "}" ; 
+                    return "}";
                 case SyntaxKind.FalseKeyword:
-                    return "false" ; 
+                    return "false";
                 case SyntaxKind.TrueKeyword:
-                    return "true" ;     
+                    return "true";
                 case SyntaxKind.LetKeyword:
-                    return "let" ;
+                    return "let";
                 case SyntaxKind.VarKeyword:
-                    return "var" ;
+                    return "var";
                 case SyntaxKind.ElseKeyword:
-                    return "else" ;
+                    return "else";
                 case SyntaxKind.IfKeyword:
-                    return "if" ;
+                    return "if";
                 case SyntaxKind.WhileKeyword:
-                    return "while" ;
+                    return "while";
                 case SyntaxKind.ForKeyword:
-                    return "for" ; 
+                    return "for";
                 case SyntaxKind.ToKeyword:
-                    return "to" ; 
+                    return "to";
                 default:
-                    return null ; 
+                    return null;
             }
-        
+
         }
     }
 

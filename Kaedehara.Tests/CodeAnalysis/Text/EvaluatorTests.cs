@@ -10,6 +10,8 @@ public class EvaluatorTests
     [InlineData("1", 1)]
     [InlineData("+1", 1)]
     [InlineData("-1", -1)]
+    [InlineData("~1", -2)]
+
     [InlineData("14 + 12", 26)]
     [InlineData("12 - 3", 9)]
     [InlineData("4 * 2", 8)]
@@ -23,6 +25,24 @@ public class EvaluatorTests
     [InlineData("true == false", false)]
     [InlineData("false != false", false)]
     [InlineData("true != false", true)]
+    [InlineData("true && true", true)]
+    [InlineData("false || false", false)]
+
+    [InlineData("false | false", false)]
+    [InlineData("false | true", true)]
+    [InlineData("true | false", true)]
+    [InlineData("true | true", true)]
+
+    [InlineData("false & false", false)]
+    [InlineData("false & true", false)]
+    [InlineData("true & false", false)]
+    [InlineData("true & true", true)]
+
+    [InlineData("false ^ false", false)]
+    [InlineData("true ^ false", true)]
+    [InlineData("false ^ true", true)]
+    [InlineData("true ^ true", false)]
+
     [InlineData("true", true)]
     [InlineData("false", false)]
     [InlineData("!true", false)]
@@ -39,6 +59,16 @@ public class EvaluatorTests
     [InlineData("4 >= 4",true)]
     [InlineData("5 >= 4",true)]
     [InlineData("4 >= 5",false)]
+
+    [InlineData("1 | 2 ",3)]
+    [InlineData("1 | 0 ",1)]
+    [InlineData("1 & 3 ",1)]
+    [InlineData("1 & 0 ",0)]
+    [InlineData("1 ^ 0 ",1)]
+    [InlineData("0 ^ 1 ",1)]
+    [InlineData("1 ^ 3 ",2)]
+
+
     [InlineData("{var a = 0 if a == 0 a = 10 a}", 10)]
     [InlineData("{var a = 0 if a == 4 a = 10 a}", 0)]
 

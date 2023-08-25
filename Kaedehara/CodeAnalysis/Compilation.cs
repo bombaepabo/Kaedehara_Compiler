@@ -4,11 +4,14 @@ using Kaedehara.CodeAnalysis.Syntax;
 using System.Threading;
 using System.Linq;
 using System.Collections.Generic;
+using System.IO;
+
 
 namespace Kaedehara.CodeAnalysis
 {
     public sealed class Compilation
     {
+        private BoundGlobalScope _globalScope;
         public Compilation(SyntaxTree syntax)
         : this(null, syntax)
         {
@@ -20,7 +23,6 @@ namespace Kaedehara.CodeAnalysis
         }
 
 
-        private BoundGlobalScope _globalScope;
 
         public Compilation Previous { get; }
         public SyntaxTree Syntax { get; }
@@ -52,5 +54,9 @@ namespace Kaedehara.CodeAnalysis
             return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, value);
         }
 
+        public void EmitTree(TextWriter writer)
+        {
+            GlobalScope.Statement.WriteTo(writer);
+        }
     }
 }

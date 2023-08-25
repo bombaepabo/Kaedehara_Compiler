@@ -63,7 +63,7 @@ namespace Kaedehara.CodeAnalysis.Syntax
                     _kind = SyntaxKind.CloseParenthesisToken;
                     _position++;
                     break;
-                 case '{':
+                case '{':
                     _kind = SyntaxKind.OpenBraceToken;
                     _position++;
                     break;
@@ -71,20 +71,44 @@ namespace Kaedehara.CodeAnalysis.Syntax
                     _kind = SyntaxKind.CloseBraceToken;
                     _position++;
                     break;
+                case '~':
+                    _kind = SyntaxKind.TildeToken;
+                    _position++;
+                    break;
+                case '^':
+                    _kind = SyntaxKind.HatToken;
+                    _position++;
+                    break;
                 case '&':
-                    if (Lookahead == '&')
+                    _position++;
+                    if (Current != '&')
                     {
                         _kind = SyntaxKind.AmpersanToken;
-                        _position += 2;
+                        break;
+
                     }
-                    break;
+                    else
+                    {
+                        _kind = SyntaxKind.AmpersanAmpersanToken;
+                        _position += 1;
+                        break;
+
+                    }
                 case '|':
-                    if (Lookahead == '|')
+                   _position++;
+                    if (Current != '|')
                     {
                         _kind = SyntaxKind.PipeToken;
-                        _position += 2;
+                        break;
+
                     }
-                    break;
+                    else
+                    {
+                        _kind = SyntaxKind.PipePipeToken;
+                        _position += 1;
+                        break;
+
+                    }
                 case '=':
                     _position++;
                     if (Current != '=')
@@ -114,7 +138,7 @@ namespace Kaedehara.CodeAnalysis.Syntax
                     }
                     break;
                 case '<':
-                     _position++;
+                    _position++;
                     if (Current != '=')
                     {
                         _kind = SyntaxKind.LessToken;
@@ -185,7 +209,7 @@ namespace Kaedehara.CodeAnalysis.Syntax
         {
             while (char.IsLetter(Current))
             {
-            _position++;
+                _position++;
             }
             var length = _position - _start;
             var text = _text.ToString(_start, length);
@@ -196,7 +220,7 @@ namespace Kaedehara.CodeAnalysis.Syntax
         {
             while (char.IsWhiteSpace(Current))
             {
-            _position++;
+                _position++;
             }
             _kind = SyntaxKind.WhitespaceToken;
 
@@ -206,7 +230,7 @@ namespace Kaedehara.CodeAnalysis.Syntax
         {
             while (char.IsDigit(Current))
             {
-            _position++;
+                _position++;
 
             }
             var length = _position - _start;

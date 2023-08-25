@@ -114,6 +114,8 @@ namespace Kaedehara.CodeAnalysis
                     return -(int)operand;
                 case BoundUnaryOperatorKind.LogicalNegation:
                     return !(bool)operand;
+                case BoundUnaryOperatorKind.OnesComplement:
+                    return ~(int)operand;
                 default:
                     throw new Exception($"Unexpected unary operator {u.Op}");
             }
@@ -134,6 +136,23 @@ namespace Kaedehara.CodeAnalysis
                         return (int)left * (int)right;
                     case BoundBinaryOperatorKind.Division:
                         return (int)left / (int)right;
+
+                    case BoundBinaryOperatorKind.BitwiseAnd:
+                        if(b.type == typeof(int))
+                            return (int)left & (int)right;
+                        else
+                            return (bool)left & (bool)right;
+                    case BoundBinaryOperatorKind.BitWiseOr:
+                        if(b.type == typeof(int))
+                            return (int)left | (int)right;
+                        else
+                            return (bool)left | (bool)right;
+                    case BoundBinaryOperatorKind.BitWiseXOR:
+                        if(b.type == typeof(int))
+                            return (int)left ^ (int)right;
+                        else
+                            return (bool)left ^ (bool)right;
+
                     case BoundBinaryOperatorKind.LogicalAnd:
                         return (bool)left && (bool)right;
                     case BoundBinaryOperatorKind.LogicalOr:

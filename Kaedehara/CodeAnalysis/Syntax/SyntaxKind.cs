@@ -19,8 +19,8 @@ namespace Kaedehara.CodeAnalysis.Syntax
         TrueKeyword,
         FalseKeyword,
         IdentifierToken,
-        PipeToken,
-        AmpersanToken,
+        PipePipeToken,
+        AmpersanAmpersanToken,
         BangToken,
         EqualEqualToken,
         NotEqualToken,
@@ -47,7 +47,11 @@ namespace Kaedehara.CodeAnalysis.Syntax
         WhileStatement,
         ForKeyword,
         ForStatement,
-        ToKeyword
+        ToKeyword,
+        TildeToken,
+        AmpersanToken,
+        PipeToken,
+        HatToken
     }
 
 

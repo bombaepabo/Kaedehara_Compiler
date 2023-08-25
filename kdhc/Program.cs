@@ -11,6 +11,8 @@ namespace kdhc
         private static void Main()
         {
             var ShowTree = false;
+            var ShowProgram = false;
+
             var variables = new Dictionary<VariableSymbol, object>();
             var textBuilder = new StringBuilder();
             Compilation previous = null;
@@ -39,7 +41,13 @@ namespace kdhc
                     if (input == "#ShowTree")
                     {
                         ShowTree = !ShowTree;
-                        Console.WriteLine(ShowTree ? " Showing parse trees." : "Not showing parse trees");
+                        Console.WriteLine(ShowTree ? " Showing parse trees." : "Not showing parse trees.");
+                        continue;
+                    }
+                    else if (input == "#ShowProgram")
+                    {
+                        ShowProgram = !ShowProgram;
+                        Console.WriteLine(ShowTree ? " Showing bound trees." : "Not showing bound trees.");
                         continue;
                     }
                     else if (input == "#clear")
@@ -68,6 +76,10 @@ namespace kdhc
                 if (ShowTree)
                 {
                     syntaxTree.Root.WriteTo(Console.Out);
+                }
+                 if (ShowProgram)
+                {
+                    compilation.EmitTree(Console.Out);
                 }
 
                 if (!result.Diagnostics.Any())
