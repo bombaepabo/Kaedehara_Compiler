@@ -5,7 +5,7 @@ using System.Threading;
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
-
+using Kaedehara.CodeAnalysis.Lowering;
 
 namespace Kaedehara.CodeAnalysis
 {
@@ -49,14 +49,22 @@ namespace Kaedehara.CodeAnalysis
             {
                 return new EvaluationResult(diagnostics, null);
             }
-            var evaluator = new Evaluator(GlobalScope.Statement, variables);
+            var statement = GetStatement();
+            var evaluator = new Evaluator(statement, variables);
             var value = evaluator.Evaluate();
             return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, value);
         }
 
         public void EmitTree(TextWriter writer)
         {
-            GlobalScope.Statement.WriteTo(writer);
+            var statement = GetStatement();
+            statement.WriteTo(writer);
+        }
+
+        private BoundStatement GetStatement()
+        {
+            var result =  GlobalScope.Statement;
+            return Lowerer.Lower(result);
         }
     }
 }
