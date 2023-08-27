@@ -12,7 +12,10 @@ internal enum BoundNodeKind
     VariableDeclaration,
     IfStatement,
     WhileStatement,
-    ForStatement
+    ForStatement,
+    GoToStatement,
+    LabelStatement,
+    ConditionalGoToStatement
 }
 
 

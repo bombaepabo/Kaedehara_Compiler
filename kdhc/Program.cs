@@ -72,7 +72,6 @@ namespace kdhc
                 var compilation = previous == null 
                                     ? new Compilation(syntaxTree)
                                     : previous.ContinuedWith(syntaxTree);
-                var result = compilation.Evaluate(variables);
                 if (ShowTree)
                 {
                     syntaxTree.Root.WriteTo(Console.Out);
@@ -82,6 +81,7 @@ namespace kdhc
                     compilation.EmitTree(Console.Out);
                 }
 
+                var result = compilation.Evaluate(variables);
                 if (!result.Diagnostics.Any())
                 {
                     Console.ForegroundColor = ConsoleColor.Magenta;

@@ -1,17 +1,20 @@
 using Kaedehara.CodeAnalysis.Binding;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
+using System.Numerics;
+using System.Reflection.Emit;
 using System.Xml;
 
 namespace Kaedehara.CodeAnalysis
 {
     internal sealed class Evaluator
     {
-        private readonly BoundStatement _root;
+        private readonly BoundBlockStatement _root;
         private readonly Dictionary<VariableSymbol, object> _variables;
         private object _lastValue ;
 
-        public Evaluator(BoundStatement root, Dictionary<VariableSymbol, object> variables)
+        public Evaluator(BoundBlockStatement root, Dictionary<VariableSymbol, object> variables)
         {
             _root = root;
             _variables = variables;
@@ -20,68 +23,49 @@ namespace Kaedehara.CodeAnalysis
 
         public object Evaluate()
         {
-            EvaluateStatement(_root);
-            return _lastValue ; 
-        }
-
-        private void EvaluateStatement(BoundStatement node){
-            switch(node.Kind)
+            var labelToIndex = new Dictionary<LabelSymbol,int>();
+            for(var i = 0 ;i < _root.Statements.Length;i++){
+                if(_root.Statements[i] is BoundLabelStatement l){
+                    labelToIndex.Add(l.Label,i+1);
+                }
+            }
+            var index = 0 ;
+            while (index < _root.Statements.Length)
             {
-                case BoundNodeKind.BlockStatement:
-                     EvaluateBlockStatement((BoundBlockStatement)node);
-                    break;
+                var s = _root.Statements[index];
+                switch(s.Kind)
+                {
+              
                 case BoundNodeKind.VariableDeclaration:
-                     EvaluateVariableDeclaration((BoundVariableDeclaration)node);
-                    break;
-                case BoundNodeKind.IfStatement:
-                     EvaluateIfStatement((BoundIfStatement)node);
-                    break;
-                case BoundNodeKind.WhileStatement:
-                     EvaluateWhileStatement((BoundWhileStatement)node);
-                    break;
-                case BoundNodeKind.ForStatement:
-                     EvaluateForStatement((BoundForStatement)node);
+                     EvaluateVariableDeclaration((BoundVariableDeclaration)s);
+                    index++;
                     break;
                 case BoundNodeKind.ExpressionStatement:
-                     EvaluateExpressionStatement((BoundExpressionStatement)node);
+                     EvaluateExpressionStatement((BoundExpressionStatement)s);
+                    index++;
+                    break;
+                case BoundNodeKind.GoToStatement:
+                    var gs = (BoundGoToStatement)s;
+                    index = labelToIndex[gs.Label];
+                    break;
+                case BoundNodeKind.ConditionalGoToStatement:
+                    var cgs = (BoundConditionalGoToStatement)s ;
+                    var condition = (bool)EvaluateExpression(cgs.Condition);
+                    if(condition && !cgs.JumpIfFalse || !condition &&cgs.JumpIfFalse){
+                        index = labelToIndex[cgs.Label];
+                    }
+                    else{
+                       index++; 
+                    }
+                    break;
+                case BoundNodeKind.LabelStatement:
+                    index++;
                     break;
                 default:
-                    throw new Exception($"unexpected node {node.Kind}");
+                    throw new Exception($"unexpected node {s.Kind}");
             }
-        }
-
-        private void EvaluateForStatement(BoundForStatement node)
-        {
-            var lowerbound = (int)EvaluateExpression(node.LowerBound);
-            var upperbound = (int)EvaluateExpression(node.UpperBound);
-
-            for(var i = lowerbound; i <= upperbound;i++)
-            {
-            _variables[node.Variable] = i;
-            EvaluateStatement(node.Body);
             }
-            
-
-        }
-
-        private void EvaluateWhileStatement(BoundWhileStatement node)
-        {
-           
-           while((bool)EvaluateExpression(node.Condition)){
-            EvaluateStatement(node.Body);
-           }
-        }
-
-        private void EvaluateIfStatement(BoundIfStatement node)
-        {
-            var condition = (bool)EvaluateExpression(node.Condition);
-            if(condition){
-                EvaluateStatement(node.ThenStatement);
-            }
-            else if(node.ElseStatement != null){
-                EvaluateStatement(node.ElseStatement);
-            }
-
+            return _lastValue ; 
         }
 
         private object EvaluateExpression(BoundExpression node)
@@ -181,12 +165,6 @@ namespace Kaedehara.CodeAnalysis
         }
 
 
-        private void EvaluateBlockStatement(BoundBlockStatement node)
-        {
-            foreach (var statement in node.Statements){
-                EvaluateStatement(statement);
-            }
-        }
         private void EvaluateExpressionStatement(BoundExpressionStatement node)
         {
             _lastValue = EvaluateExpression(node.Expression);

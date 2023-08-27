@@ -5,7 +5,7 @@ namespace Kaedehara.CodeAnalysis.Binding
     {        
         public virtual BoundStatement RewriteStatement(BoundStatement node)
         {
-            switch (node.Kind)
+           switch (node.Kind)
             {
                 case BoundNodeKind.BlockStatement:
                     return RewriteBlockStatement((BoundBlockStatement)node);
@@ -17,11 +17,36 @@ namespace Kaedehara.CodeAnalysis.Binding
                     return RewriteWhileStatement((BoundWhileStatement)node);
                 case BoundNodeKind.ForStatement:
                     return RewriteForStatement((BoundForStatement)node);
+                case BoundNodeKind.LabelStatement:
+                    return RewriteLabelStatement((BoundLabelStatement)node);
+                case BoundNodeKind.GoToStatement:
+                    return RewriteGoToStatement((BoundGoToStatement)node);
+                case BoundNodeKind.ConditionalGoToStatement:
+                    return RewriteConditionalGoToStatement((BoundConditionalGoToStatement)node);
                 case BoundNodeKind.ExpressionStatement:
                     return RewriteExpressionStatement((BoundExpressionStatement)node);
                 default:
                     throw new Exception($"Unexpected node: {node.Kind}");
             }
+        }
+
+        protected virtual BoundStatement RewriteConditionalGoToStatement(BoundConditionalGoToStatement node)
+        {
+            var condition = RewriteExpression(node.Condition);
+            if(condition == node.Condition){
+                return node;
+            }
+            return new BoundConditionalGoToStatement(node.Label,condition,node.JumpIfFalse);
+        }
+
+        protected virtual BoundStatement RewriteGoToStatement(BoundGoToStatement node)
+        {
+            return node;
+        }
+
+        protected virtual BoundStatement RewriteLabelStatement(BoundLabelStatement node)
+        {
+            return node;
         }
 
         protected virtual BoundStatement RewriteBlockStatement(BoundBlockStatement node)
