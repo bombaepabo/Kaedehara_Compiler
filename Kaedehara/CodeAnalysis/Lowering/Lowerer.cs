@@ -45,7 +45,7 @@ namespace Kaedehara.CodeAnalysis.Lowering
         {
             if(node.ElseStatement == null){
                var endLabel = GenerateLabel();
-               var goToFalse = new BoundConditionalGoToStatement(endLabel,node.Condition,true);
+               var goToFalse = new BoundConditionalGoToStatement(endLabel,node.Condition,false);
                var endLabelStatement = new BoundLabelStatement(endLabel);
                var result = new BoundBlockStatement(ImmutableArray.Create<BoundStatement>(goToFalse,node.ThenStatement,endLabelStatement));
                return RewriteStatement(result);
@@ -53,7 +53,7 @@ namespace Kaedehara.CodeAnalysis.Lowering
             else{
                var elseLabel = GenerateLabel();
                var endLabel = GenerateLabel();
-               var goToFalse = new BoundConditionalGoToStatement(elseLabel,node.Condition,true);
+               var goToFalse = new BoundConditionalGoToStatement(elseLabel,node.Condition,false);
                var goToEndStatement = new BoundGoToStatement(endLabel);
                var elseLabelStatement = new BoundLabelStatement(elseLabel);
                var endLabelStatement = new BoundLabelStatement(endLabel);
@@ -77,7 +77,7 @@ namespace Kaedehara.CodeAnalysis.Lowering
             var gotoCheck = new BoundGoToStatement(checkLabel);
             var continueLabelStatement = new BoundLabelStatement(continueLabel);
             var checkLabelStatement = new BoundLabelStatement(checkLabel);
-            var gotoTrue = new BoundConditionalGoToStatement(continueLabel, node.Condition, false);
+            var gotoTrue = new BoundConditionalGoToStatement(continueLabel, node.Condition);
             var endLabelStatement = new BoundLabelStatement(endLabel);
 
             var result = new BoundBlockStatement(ImmutableArray.Create<BoundStatement>(
@@ -96,10 +96,12 @@ namespace Kaedehara.CodeAnalysis.Lowering
         {
          var VariableDeclaration = new BoundVariableDeclaration(node.Variable,node.LowerBound);
          var VariableExpression = new BoundVariableExpression(node.Variable);
+         var upperBoundSymbol = new VariableSymbol("upperBound",true,typeof(int));
+         var upperBoundDeclaration = new BoundVariableDeclaration(upperBoundSymbol,node.UpperBound);
          var condition =    new BoundBinaryExpression( 
                             VariableExpression,
                             BoundBinaryOperator.Bind(SyntaxKind.LessOrEqualsToken,typeof(int),typeof(int)),
-                            node.UpperBound);
+                           new BoundVariableExpression(upperBoundSymbol));
         var increment = new BoundExpressionStatement(
                             new BoundAssignmentExpression(
                             node.Variable,
@@ -112,7 +114,8 @@ namespace Kaedehara.CodeAnalysis.Lowering
          );
          var whileBlock = new BoundBlockStatement(ImmutableArray.Create<BoundStatement>(node.Body,increment));
          var whileStatement = new BoundWhileStatement(condition,whileBlock);
-         var result = new BoundBlockStatement(ImmutableArray.Create<BoundStatement>(VariableDeclaration,whileStatement));
+         var result = new BoundBlockStatement(
+            ImmutableArray.Create<BoundStatement>(VariableDeclaration,upperBoundDeclaration,whileStatement));
          return RewriteStatement(result) ;
 
         }

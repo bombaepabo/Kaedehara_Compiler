@@ -2,10 +2,10 @@ using System.Collections.Immutable;
 namespace Kaedehara.CodeAnalysis.Binding
 {
     internal abstract class BoundTreeRewriter
-    {        
+    {
         public virtual BoundStatement RewriteStatement(BoundStatement node)
         {
-           switch (node.Kind)
+            switch (node.Kind)
             {
                 case BoundNodeKind.BlockStatement:
                     return RewriteBlockStatement((BoundBlockStatement)node);
@@ -33,10 +33,11 @@ namespace Kaedehara.CodeAnalysis.Binding
         protected virtual BoundStatement RewriteConditionalGoToStatement(BoundConditionalGoToStatement node)
         {
             var condition = RewriteExpression(node.Condition);
-            if(condition == node.Condition){
+            if (condition == node.Condition)
+            {
                 return node;
             }
-            return new BoundConditionalGoToStatement(node.Label,condition,node.JumpIfFalse);
+            return new BoundConditionalGoToStatement(node.Label, condition, node.JumpIfTrue);
         }
 
         protected virtual BoundStatement RewriteGoToStatement(BoundGoToStatement node)
@@ -53,7 +54,7 @@ namespace Kaedehara.CodeAnalysis.Binding
         {
             ImmutableArray<BoundStatement>.Builder builder = null;
 
-            for (var i = 0; i< node.Statements.Length; i++)
+            for (var i = 0; i < node.Statements.Length; i++)
             {
                 var oldStatement = node.Statements[i];
                 var newStatement = RewriteStatement(oldStatement);
@@ -65,7 +66,7 @@ namespace Kaedehara.CodeAnalysis.Binding
 
                         for (var j = 0; j < i; j++)
                             builder.Add(node.Statements[j]);
-                    }                    
+                    }
                 }
 
                 if (builder != null)
