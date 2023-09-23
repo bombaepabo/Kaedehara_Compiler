@@ -1,3 +1,5 @@
+using Kaedehara.CodeAnalysis.Symbols;
+
 namespace Kaedehara.CodeAnalysis.Binding;
 
 internal sealed class BoundVariableDeclaration: BoundStatement

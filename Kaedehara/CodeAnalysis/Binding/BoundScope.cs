@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Kaedehara.CodeAnalysis.Symbols;
 
 namespace Kaedehara.CodeAnalysis.Binding
 {

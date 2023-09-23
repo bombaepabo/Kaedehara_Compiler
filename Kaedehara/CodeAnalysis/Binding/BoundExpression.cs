@@ -1,8 +1,10 @@
+using Kaedehara.CodeAnalysis.Symbols;
+
 namespace Kaedehara.CodeAnalysis.Binding;
 
 internal abstract class BoundExpression : BoundNode
 {
-    public abstract Type type { get; }
+    public abstract TypeSymbol Type { get; }
 }
 
 

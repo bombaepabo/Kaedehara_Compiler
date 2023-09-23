@@ -6,6 +6,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using Kaedehara.CodeAnalysis.Lowering;
+using Kaedehara.CodeAnalysis.Symbols;
 
 namespace Kaedehara.CodeAnalysis
 {

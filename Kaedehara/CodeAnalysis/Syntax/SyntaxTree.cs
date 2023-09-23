@@ -32,20 +32,36 @@ namespace Kaedehara.CodeAnalysis.Syntax
         {
             var sourceText = SourceText.From(text);
             return ParseToken(sourceText);
+        } 
+        public static ImmutableArray<SyntaxToken> ParseToken(string text, out ImmutableArray<Diagnostic> diagnostics)
+        {
+            var sourceText = SourceText.From(text);
+            return ParseToken(sourceText, out diagnostics);
         }
 
-        public static IEnumerable<SyntaxToken> ParseToken(SourceText text)
+
+        public static ImmutableArray<SyntaxToken> ParseToken(SourceText text)
         {
-            var lexer = new Lexer(text);
-            while (true)
+            return ParseToken(text, out _);
+        }
+          public static ImmutableArray<SyntaxToken> ParseToken(SourceText text , out ImmutableArray<Diagnostic> diagnostics)
+        {
+            IEnumerable<SyntaxToken> LexTokens(Lexer lexer)
             {
-                var token = lexer.Lex();
-                if (token.Kind == SyntaxKind.EndOfFileToken)
+                while (true)
                 {
-                    break;
+                    var token = lexer.Lex();
+                    if (token.Kind == SyntaxKind.EndOfFileToken)
+                    {
+                        break;
+                    }
+                    yield return token;
                 }
-                yield return token;
             }
+            var l = new Lexer(text);
+            var result = LexTokens(l).ToImmutableArray();
+            diagnostics = l.Diagonostics.ToImmutableArray();
+            return result ;
         }
     }
 

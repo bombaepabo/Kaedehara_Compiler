@@ -1,4 +1,5 @@
 using Kaedehara.CodeAnalysis.Binding;
+using Kaedehara.CodeAnalysis.Symbols;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
@@ -8,7 +9,7 @@ using System.Xml;
 
 namespace Kaedehara.CodeAnalysis
 {
-    
+
     internal sealed class Evaluator
     {
         private readonly BoundBlockStatement _root;
@@ -24,7 +25,7 @@ namespace Kaedehara.CodeAnalysis
 
         public object Evaluate()
         {
-            var labelToIndex = new Dictionary<LabelSymbol, int>();
+            var labelToIndex = new Dictionary<BoundLabel, int>();
             for (var i = 0; i < _root.Statements.Length; i++)
             {
                 if (_root.Statements[i] is BoundLabelStatement l)
@@ -127,17 +128,17 @@ namespace Kaedehara.CodeAnalysis
                     return (int)left / (int)right;
 
                 case BoundBinaryOperatorKind.BitwiseAnd:
-                    if (b.type == typeof(int))
+                    if (b.Type == TypeSymbol.Int)
                         return (int)left & (int)right;
                     else
                         return (bool)left & (bool)right;
                 case BoundBinaryOperatorKind.BitWiseOr:
-                    if (b.type == typeof(int))
+                    if (b.Type == TypeSymbol.Int)
                         return (int)left | (int)right;
                     else
                         return (bool)left | (bool)right;
                 case BoundBinaryOperatorKind.BitWiseXOR:
-                    if (b.type == typeof(int))
+                    if (b.Type == TypeSymbol.Int)
                         return (int)left ^ (int)right;
                     else
                         return (bool)left ^ (bool)right;

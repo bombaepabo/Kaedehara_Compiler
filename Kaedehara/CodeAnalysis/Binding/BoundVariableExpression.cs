@@ -1,3 +1,5 @@
+using Kaedehara.CodeAnalysis.Symbols;
+
 namespace Kaedehara.CodeAnalysis.Binding;
 
 internal sealed class BoundVariableExpression : BoundExpression
@@ -11,7 +13,7 @@ internal sealed class BoundVariableExpression : BoundExpression
 
     public VariableSymbol Variable { get; }
 
-    public override Type type => Variable.Type;
+    public override TypeSymbol Type => Variable.Type;
 }
 
 

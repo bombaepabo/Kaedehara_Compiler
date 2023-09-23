@@ -1,32 +1,47 @@
 using Kaedehara.CodeAnalysis.Syntax;
 using Kaedehara.CodeAnalysis;
 using Kaedehara.CodeAnalysis.Text;
+using Kaedehara.CodeAnalysis.Symbols;
 
 namespace kdhc
 {
-    internal sealed class KaedeharaRepl :Repl
+    internal sealed class KaedeharaRepl : Repl
     {
-        private Compilation _previous ;
-        private bool _showTree ;
-        private bool _showProgram ;
-        private readonly Dictionary<VariableSymbol, object> _variables  = new Dictionary<VariableSymbol, object>();
-        protected override void RenderLine(string line){
+        private Compilation _previous;
+        private bool _showTree;
+        private bool _showProgram;
+        private readonly Dictionary<VariableSymbol, object> _variables = new Dictionary<VariableSymbol, object>();
+        protected override void RenderLine(string line)
+        {
             var tokens = SyntaxTree.ParseToken(line);
-            foreach(var token in tokens){
+            foreach (var token in tokens)
+            {
                 var isKeyword = token.Kind.ToString().EndsWith("Keyword");
                 var isNumber = token.Kind == SyntaxKind.NumberToken;
-                if(isKeyword){
+                var isIdentifier = token.Kind == SyntaxKind.IdentifierToken;
+                if (isKeyword)
+                {
                     Console.ForegroundColor = ConsoleColor.Blue;
                 }
-                else if(!isNumber)
+                else if (isIdentifier)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+
+                }
+                else if (isNumber)
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                }
+                else
                 {
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                 }
+
                 Console.Write(token.Text);
                 Console.ResetColor();
             }
         }
-          protected override void EvaluateMetaCommand(string input)
+        protected override void EvaluateMetaCommand(string input)
         {
             switch (input)
             {
@@ -53,16 +68,26 @@ namespace kdhc
 
         protected override bool isCompleteSubmission(string text)
         {
-            if(string.IsNullOrEmpty(text)){
+            if (string.IsNullOrEmpty(text))
+            {
+                return true;
+            }
+            var lastTwoLinesAreBlank = text.Split(Environment.NewLine).Reverse().TakeWhile(s => string.IsNullOrEmpty(s)).Take(2).Count() == 2;
+            if(lastTwoLinesAreBlank){
                 return true ;
             }
             var syntaxTree = SyntaxTree.Parse(text);
-                if (syntaxTree.Diagnostics.Any())
-                {
-                    return false ;
-                }
-            return true ;
+            if (syntaxTree.Diagnostics.Any())
+            {
+                return false;
+            }
+            if (syntaxTree.Root.Statement.GetLastToken().IsMissing)
+            {
+                return false;
+            }
+            return true;
         }
+
         protected override void EvaluateSubmission(string text)
         {
             var syntaxTree = SyntaxTree.Parse(text);

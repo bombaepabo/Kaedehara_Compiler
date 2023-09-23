@@ -51,7 +51,8 @@ namespace Kaedehara.CodeAnalysis.Syntax
         TildeToken,
         AmpersanToken,
         PipeToken,
-        HatToken
+        HatToken,
+        StringToken
     }
 
 

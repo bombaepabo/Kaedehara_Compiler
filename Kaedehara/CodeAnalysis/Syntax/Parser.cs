@@ -218,6 +218,8 @@ namespace Kaedehara.CodeAnalysis.Syntax
                     return ParseBooleanLiteral();
                 case SyntaxKind.NumberToken:
                     return ParseNumberLitheral();
+                case SyntaxKind.StringToken:
+                    return ParseStringLitheral();
 
                 case SyntaxKind.IdentifierToken:
                 default:
@@ -241,6 +243,11 @@ namespace Kaedehara.CodeAnalysis.Syntax
         {
             var numberToken = MatchToken(SyntaxKind.NumberToken);
             return new LiteralExpressionSyntax(numberToken);
+        }
+        private ExpressionSyntax ParseStringLitheral()
+        {
+            var stringToken = MatchToken(SyntaxKind.StringToken);
+            return new LiteralExpressionSyntax(stringToken);
         }
         private ExpressionSyntax ParseNameExpression()
         {

@@ -1,5 +1,6 @@
-namespace Kaedehara.CodeAnalysis.Binding;
+using Kaedehara.CodeAnalysis.Symbols;
 
+namespace Kaedehara.CodeAnalysis.Binding;
 internal sealed class BoundAssignmentExpression : BoundExpression
 {
     public BoundAssignmentExpression(VariableSymbol variable, BoundExpression expression)
@@ -8,7 +9,7 @@ internal sealed class BoundAssignmentExpression : BoundExpression
         Expression = expression;
     }
 
-    public override Type type => Expression.type;
+    public override TypeSymbol Type => Expression.Type;
 
     public override BoundNodeKind Kind => BoundNodeKind.AssignmentExpression;
 

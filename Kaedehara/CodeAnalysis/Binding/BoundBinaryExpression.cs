@@ -1,3 +1,5 @@
+using Kaedehara.CodeAnalysis.Symbols;
+
 namespace Kaedehara.CodeAnalysis.Binding;
 internal sealed partial class BoundBinaryExpression : BoundExpression
 {
@@ -12,7 +14,7 @@ internal sealed partial class BoundBinaryExpression : BoundExpression
     public BoundExpression Right { get; }
     public BoundExpression Left { get; }
     public override BoundNodeKind Kind => BoundNodeKind.BinaryExpression;
-    public override Type type => Op.Type;
+    public override TypeSymbol Type => Op.Type;
 }
 
 

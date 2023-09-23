@@ -52,6 +52,14 @@ namespace Kaedehara.CodeAnalysis.Syntax
                 return writer.ToString();
             }
         }
+        public SyntaxToken GetLastToken()
+        {
+            if( this is SyntaxToken token)
+            {
+                return token ; 
+            }
+            return GetChildren().Last().GetLastToken();
+        }
         private static void PrettyPrint(TextWriter writer, SyntaxNode node, string indent = "", bool isLast = true)
         {
             var isToConsole = writer == Console.Out;
