@@ -52,7 +52,10 @@ namespace Kaedehara.CodeAnalysis.Syntax
         AmpersanToken,
         PipeToken,
         HatToken,
-        StringToken
+        StringToken,
+        CallExpression,
+        CommaToken,
+
     }
 
 

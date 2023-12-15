@@ -16,7 +16,8 @@ internal enum BoundNodeKind
     GoToStatement,
     LabelStatement,
     ConditionalGoToStatement,
-    ErrorExpression
+    ErrorExpression,
+    CallExpression
 }
 
 

@@ -3,7 +3,7 @@ using Kaedehara.CodeAnalysis.Symbols;
 namespace Kaedehara.CodeAnalysis.Symbols
 {
 
-    public sealed class VariableSymbol:Symbol
+    public class VariableSymbol:Symbol
     {
         internal VariableSymbol(string name,bool isReadOnly, TypeSymbol type)
             :base(name)

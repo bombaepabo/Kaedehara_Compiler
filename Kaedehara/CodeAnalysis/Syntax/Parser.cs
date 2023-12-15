@@ -88,21 +88,21 @@ namespace Kaedehara.CodeAnalysis.Syntax
 
         private StatementSyntax ParseForStatement()
         {
-             var keyword = MatchToken(SyntaxKind.ForKeyword);
-             var identifier = MatchToken(SyntaxKind.IdentifierToken);
-             var equalsToken = MatchToken(SyntaxKind.EqualsToken);
-             var lowerbound = ParseExpression();
-             var toKeyword = MatchToken(SyntaxKind.ToKeyword);
-             var upperbound = ParseExpression();
-             var body = ParseStatement();
-            return new ForStatementSyntax(keyword,identifier,equalsToken,lowerbound,toKeyword,upperbound,body);
+            var keyword = MatchToken(SyntaxKind.ForKeyword);
+            var identifier = MatchToken(SyntaxKind.IdentifierToken);
+            var equalsToken = MatchToken(SyntaxKind.EqualsToken);
+            var lowerbound = ParseExpression();
+            var toKeyword = MatchToken(SyntaxKind.ToKeyword);
+            var upperbound = ParseExpression();
+            var body = ParseStatement();
+            return new ForStatementSyntax(keyword, identifier, equalsToken, lowerbound, toKeyword, upperbound, body);
         }
         private StatementSyntax ParseWhileStatement()
         {
             var keyword = MatchToken(SyntaxKind.WhileKeyword);
             var condition = ParseExpression();
             var body = ParseStatement();
-            return new WhileStatementSyntax(keyword,condition,body);
+            return new WhileStatementSyntax(keyword, condition, body);
         }
 
         private StatementSyntax ParseIfStatement()
@@ -111,17 +111,18 @@ namespace Kaedehara.CodeAnalysis.Syntax
             var condition = ParseExpression();
             var statement = ParseStatement();
             var elseClause = ParseElseClause();
-            return new IfStatementSyntax(keyword,condition,statement,elseClause);
+            return new IfStatementSyntax(keyword, condition, statement, elseClause);
         }
 
         private ElseClauseSyntax ParseElseClause()
         {
-            if(Current.Kind != SyntaxKind.ElseKeyword){
-                return null ;
+            if (Current.Kind != SyntaxKind.ElseKeyword)
+            {
+                return null;
             }
             var keyword = NextToken();
             var statement = ParseStatement();
-            return new ElseClauseSyntax(keyword,statement);
+            return new ElseClauseSyntax(keyword, statement);
         }
 
         private BlockStatementSyntax ParseBlockStatement()
@@ -135,7 +136,8 @@ namespace Kaedehara.CodeAnalysis.Syntax
                 var statement = ParseStatement();
                 statements.Add(statement);
 
-                if(Current == startToken){
+                if (Current == startToken)
+                {
                     NextToken();
                 }
             }
@@ -223,9 +225,43 @@ namespace Kaedehara.CodeAnalysis.Syntax
 
                 case SyntaxKind.IdentifierToken:
                 default:
-                    return ParseNameExpression();
+                    return ParseNameOrCallExpression();
             }
         }
+
+        private ExpressionSyntax ParseNameOrCallExpression()
+        {
+            if (Peek(0).Kind == SyntaxKind.IdentifierToken && Peek(1).Kind == SyntaxKind.OpenParenthesisToken)
+                return ParseCallExpression();
+            return ParseNameExpression();
+        }
+
+        private ExpressionSyntax ParseCallExpression()
+        {
+            var identifer = MatchToken(SyntaxKind.IdentifierToken);
+            var OpenParenthesisToken = MatchToken(SyntaxKind.OpenParenthesisToken);
+            var arguments = ParseArguments();
+            var CloseParenthesisToken = MatchToken(SyntaxKind.CloseParenthesisToken);
+            return new CallExpressionSyntax(identifer, OpenParenthesisToken, arguments, CloseParenthesisToken);
+        }
+
+        private SeparatedSyntaxList<ExpressionSyntax> ParseArguments()
+        {
+            var nodesAndSeperators = ImmutableArray.CreateBuilder<SyntaxNode>();
+            while (Current.Kind != SyntaxKind.CloseParenthesisToken &&
+                  Current.Kind != SyntaxKind.EndOfFileToken)
+            {
+                var expression = ParseExpression();
+                nodesAndSeperators.Add(expression);
+                if (Current.Kind != SyntaxKind.CloseParenthesisToken)
+                {
+                    var comma = MatchToken(SyntaxKind.CommaToken);
+                    nodesAndSeperators.Add(comma);
+                }
+            }
+            return new SeparatedSyntaxList<ExpressionSyntax>(nodesAndSeperators.ToImmutable());
+        }
+
         private ExpressionSyntax ParseParenthesizedExpression()
         {
             var left = MatchToken(SyntaxKind.OpenParenthesisToken);
@@ -252,6 +288,7 @@ namespace Kaedehara.CodeAnalysis.Syntax
         private ExpressionSyntax ParseNameExpression()
         {
             var identifierToken = MatchToken(SyntaxKind.IdentifierToken);
+
             return new NameExpressionSyntax(identifierToken);
         }
 

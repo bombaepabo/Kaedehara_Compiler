@@ -28,15 +28,13 @@ namespace Kaedehara.CodeAnalysis.Syntax
                         yield return child ; 
                     }
                 }
-                else if (typeof(IEnumerable<SyntaxNode>).IsAssignableFrom(property.PropertyType))
+                else if (typeof(SeparatedSyntaxList).IsAssignableFrom(property.PropertyType))
                 {
-                    var children = (IEnumerable<SyntaxNode>)property.GetValue(this);
+                    var seperatorSyntaxList = (SeparatedSyntaxList)property.GetValue(this);
                     
-                    foreach (var child in children)    
-                         if(child != null)
-                         {
+                    foreach (var child in seperatorSyntaxList.GetWithSeperators())    
                         yield return child ; 
-                        }            
+                           
                 }
             }
         }
