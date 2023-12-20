@@ -15,6 +15,7 @@ namespace Kaedehara.CodeAnalysis
         private readonly BoundBlockStatement _root;
         private readonly Dictionary<VariableSymbol, object> _variables;
         private object _lastValue;
+        private Random _random;
 
         public Evaluator(BoundBlockStatement root, Dictionary<VariableSymbol, object> variables)
         {
@@ -88,10 +89,30 @@ namespace Kaedehara.CodeAnalysis
                     return EvaluateUnaryExpression((BoundUnaryExpression)node);
                 case BoundNodeKind.BinaryExpression:
                     return EvaluateBinaryExpression((BoundBinaryExpression)node);
-                  case BoundNodeKind.CallExpression:
+                case BoundNodeKind.CallExpression:
                     return EvaluateCallExpression((BoundCallExpression)node);
+                case BoundNodeKind.ConversionExpression:
+                    return EvaluateConversionExpression((BoundConversionExpression)node);
                 default:
                     throw new Exception($"Unexpected node {node.Kind}");
+            }
+        }
+
+        private object EvaluateConversionExpression(BoundConversionExpression node)
+        {
+            var value = EvaluateExpression(node.Expression);
+            if(node.Type == TypeSymbol.Bool){
+                return Convert.ToBoolean(value);
+            }
+            else if(node.Type == TypeSymbol.Int){
+                return Convert.ToInt32(value);
+            }
+            else if(node.Type == TypeSymbol.String){
+                return Convert.ToString(value);
+            }
+            else{
+                throw new Exception($"Unexpected node {node.Type}");
+
             }
         }
 
@@ -104,6 +125,13 @@ namespace Kaedehara.CodeAnalysis
                 var message = (string)EvaluateExpression(node.Arguments[0]);
                 Console.WriteLine(message);
                 return null;
+            }
+            else if (node.Function == BuiltinFunctions.Rnd){
+                var max = (int)EvaluateExpression(node.Arguments[0]);
+                if (_random == null){
+                    _random = new Random();
+                }
+                return _random.Next(max);
             }
             else {
                 throw new Exception($"Unexpected function {node.Function}");
