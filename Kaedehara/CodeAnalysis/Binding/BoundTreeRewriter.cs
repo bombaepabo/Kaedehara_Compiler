@@ -17,6 +17,10 @@ namespace Kaedehara.CodeAnalysis.Binding
                     return RewriteWhileStatement((BoundWhileStatement)node);
                 case BoundNodeKind.ForStatement:
                     return RewriteForStatement((BoundForStatement)node);
+                case BoundNodeKind.FunctionDeclaration:
+                    return RewriteFunctionDeclaration((BoundFunctionDeclaration)node);
+                case BoundNodeKind.ReturnStatement:
+                    return RewriteReturnStatement((BoundReturnStatement)node);
                 case BoundNodeKind.LabelStatement:
                     return RewriteLabelStatement((BoundLabelStatement)node);
                 case BoundNodeKind.GoToStatement:
@@ -120,6 +124,24 @@ namespace Kaedehara.CodeAnalysis.Binding
             return new BoundForStatement(node.Variable, lowerBound, upperBound, body);
         }
 
+        protected virtual BoundStatement RewriteFunctionDeclaration(BoundFunctionDeclaration node)
+        {
+            var body = (BoundBlockStatement)RewriteStatement(node.Body);
+            if (body == node.Body)
+                return node;
+
+            return new BoundFunctionDeclaration(node.Function, body);
+        }
+
+        protected virtual BoundStatement RewriteReturnStatement(BoundReturnStatement node)
+        {
+            var expression = node.Expression == null ? null : RewriteExpression(node.Expression);
+            if (expression == node.Expression)
+                return node;
+
+            return new BoundReturnStatement(expression);
+        }
+
         protected virtual BoundStatement RewriteExpressionStatement(BoundExpressionStatement node)
         {
             var expression = RewriteExpression(node.Expression);
@@ -149,6 +171,12 @@ namespace Kaedehara.CodeAnalysis.Binding
                     return RewriteCallExpression((BoundCallExpression)node);
                 case BoundNodeKind.ConversionExpression:
                     return RewriteConversionExpression((BoundConversionExpression)node);
+                case BoundNodeKind.ArrayLiteralExpression:
+                    return RewriteArrayLiteralExpression((BoundArrayLiteralExpression)node);
+                case BoundNodeKind.ArrayAccessExpression:
+                    return RewriteArrayAccessExpression((BoundArrayAccessExpression)node);
+                case BoundNodeKind.ArrayAssignmentExpression:
+                    return RewriteArrayAssignmentExpression((BoundArrayAssignmentExpression)node);
                 
                 default:
                     throw new Exception($"Unexpected node: {node.Kind}");
@@ -234,6 +262,47 @@ namespace Kaedehara.CodeAnalysis.Binding
                 return node;
 
             return new BoundBinaryExpression(left, node.Op, right);
+        }
+
+        protected virtual BoundExpression RewriteArrayLiteralExpression(BoundArrayLiteralExpression node)
+        {
+            var builder = ImmutableArray.CreateBuilder<BoundExpression>();
+            var changed = false;
+            foreach (var element in node.Elements)
+            {
+                var rewritten = RewriteExpression(element);
+                builder.Add(rewritten);
+                if (rewritten != element)
+                {
+                    changed = true;
+                }
+            }
+
+            if (!changed)
+                return node;
+
+            return new BoundArrayLiteralExpression(node.Type, builder.ToImmutable());
+        }
+
+        protected virtual BoundExpression RewriteArrayAccessExpression(BoundArrayAccessExpression node)
+        {
+            var array = RewriteExpression(node.Array);
+            var index = RewriteExpression(node.Index);
+            if (array == node.Array && index == node.Index)
+                return node;
+
+            return new BoundArrayAccessExpression(array, index);
+        }
+
+        protected virtual BoundExpression RewriteArrayAssignmentExpression(BoundArrayAssignmentExpression node)
+        {
+            var array = RewriteExpression(node.Array);
+            var index = RewriteExpression(node.Index);
+            var expression = RewriteExpression(node.Expression);
+            if (array == node.Array && index == node.Index && expression == node.Expression)
+                return node;
+
+            return new BoundArrayAssignmentExpression(array, index, expression);
         }
     }
 }

@@ -29,16 +29,30 @@ namespace Kaedehara.CodeAnalysis.Binding
                 return Conversion.Identity;
             }
             if (from == TypeSymbol.Int || 
-                from == TypeSymbol.Bool){
+                from == TypeSymbol.Bool ||
+                from == TypeSymbol.Float ||
+                from == TypeSymbol.Char){
                     if(to == TypeSymbol.String){
                         return Conversion.Explicit;
                     }
                 }
              if (from == TypeSymbol.String){
-                    if(to == TypeSymbol.Bool || to == TypeSymbol.Int){
+                    if(to == TypeSymbol.Bool || to == TypeSymbol.Int || to == TypeSymbol.Float || to == TypeSymbol.Char){
                         return Conversion.Explicit;
                     }
                 }
+             if (from == TypeSymbol.Int && to == TypeSymbol.Float){
+                 return Conversion.Implicit;
+             }
+             if (from == TypeSymbol.Float && to == TypeSymbol.Int){
+                 return Conversion.Explicit;
+             }
+             if (from == TypeSymbol.Int && to == TypeSymbol.Char){
+                 return Conversion.Explicit;
+             }
+             if (from == TypeSymbol.Char && to == TypeSymbol.Int){
+                 return Conversion.Explicit;
+             }
             return Conversion.None;
         }
     }

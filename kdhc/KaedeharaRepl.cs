@@ -152,10 +152,40 @@ namespace kdhc
 
                     Console.Write(suffix);
                     Console.WriteLine();
+
+                    var indent = "";
+                    foreach (var c in prefix)
+                    {
+                        if (c == '\t') indent += '\t';
+                        else indent += ' ';
+                    }
+                    var errorLength = error.Length;
+                    if (errorLength == 0) errorLength = 1;
+
+                    Console.Write("    ");
+                    Console.Write(indent);
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.Write(new string('~', errorLength));
+                    Console.ResetColor();
+                    Console.WriteLine();
                 }
                 Console.WriteLine();
 
             }
+        }
+
+        protected override IEnumerable<string> GetCompletions(string prefix)
+        {
+            var keywords = new[]
+            {
+                "let", "var", "fn", "return", "if", "else", "while", "for", "to",
+                "true", "false", "int", "float", "char", "bool", "string", "void"
+            };
+
+            var variables = _variables.Keys.Select(v => v.Name);
+
+            var all = keywords.Concat(variables).Distinct();
+            return all.Where(x => x.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

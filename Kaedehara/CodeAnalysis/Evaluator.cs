@@ -14,30 +14,39 @@ namespace Kaedehara.CodeAnalysis
     {
         private readonly BoundBlockStatement _root;
         private readonly Dictionary<VariableSymbol, object> _variables;
+        private readonly HashSet<VariableSymbol> _globals;
+        private readonly Stack<Dictionary<VariableSymbol, object>> _locals = new Stack<Dictionary<VariableSymbol, object>>();
+        private readonly Stack<FunctionSymbol> _currentFunctions = new Stack<FunctionSymbol>();
         private object _lastValue;
         private Random _random;
 
-        public Evaluator(BoundBlockStatement root, Dictionary<VariableSymbol, object> variables)
+        public Evaluator(BoundBlockStatement root, Dictionary<VariableSymbol, object> variables, HashSet<VariableSymbol> globals)
         {
             _root = root;
             _variables = variables;
+            _globals = globals;
         }
 
 
         public object Evaluate()
         {
+            return EvaluateBlock(_root);
+        }
+
+        private object EvaluateBlock(BoundBlockStatement block)
+        {
             var labelToIndex = new Dictionary<BoundLabel, int>();
-            for (var i = 0; i < _root.Statements.Length; i++)
+            for (var i = 0; i < block.Statements.Length; i++)
             {
-                if (_root.Statements[i] is BoundLabelStatement l)
+                if (block.Statements[i] is BoundLabelStatement l)
                 {
                     labelToIndex.Add(l.Label, i + 1);
                 }
             }
             var index = 0;
-            while (index < _root.Statements.Length)
+            while (index < block.Statements.Length)
             {
-                var s = _root.Statements[index];
+                var s = block.Statements[index];
                 switch (s.Kind)
                 {
 
@@ -68,6 +77,13 @@ namespace Kaedehara.CodeAnalysis
                     case BoundNodeKind.LabelStatement:
                         index++;
                         break;
+                    case BoundNodeKind.FunctionDeclaration:
+                        index++;
+                        break;
+                    case BoundNodeKind.ReturnStatement:
+                        var rs = (BoundReturnStatement)s;
+                        var val = rs.Expression == null ? null : EvaluateExpression(rs.Expression);
+                        return val;
                     default:
                         throw new Exception($"unexpected node {s.Kind}");
                 }
@@ -93,9 +109,41 @@ namespace Kaedehara.CodeAnalysis
                     return EvaluateCallExpression((BoundCallExpression)node);
                 case BoundNodeKind.ConversionExpression:
                     return EvaluateConversionExpression((BoundConversionExpression)node);
+                case BoundNodeKind.ArrayLiteralExpression:
+                    return EvaluateArrayLiteralExpression((BoundArrayLiteralExpression)node);
+                case BoundNodeKind.ArrayAccessExpression:
+                    return EvaluateArrayAccessExpression((BoundArrayAccessExpression)node);
+                case BoundNodeKind.ArrayAssignmentExpression:
+                    return EvaluateArrayAssignmentExpression((BoundArrayAssignmentExpression)node);
                 default:
                     throw new Exception($"Unexpected node {node.Kind}");
             }
+        }
+
+        private object EvaluateArrayLiteralExpression(BoundArrayLiteralExpression node)
+        {
+            var elements = new object[node.Elements.Length];
+            for (int i = 0; i < node.Elements.Length; i++)
+            {
+                elements[i] = EvaluateExpression(node.Elements[i]);
+            }
+            return elements;
+        }
+
+        private object EvaluateArrayAccessExpression(BoundArrayAccessExpression node)
+        {
+            var array = (object[])EvaluateExpression(node.Array);
+            var index = (int)EvaluateExpression(node.Index);
+            return array[index];
+        }
+
+        private object EvaluateArrayAssignmentExpression(BoundArrayAssignmentExpression node)
+        {
+            var array = (object[])EvaluateExpression(node.Array);
+            var index = (int)EvaluateExpression(node.Index);
+            var value = EvaluateExpression(node.Expression);
+            array[index] = value;
+            return value;
         }
 
         private object EvaluateConversionExpression(BoundConversionExpression node)
@@ -105,10 +153,18 @@ namespace Kaedehara.CodeAnalysis
                 return Convert.ToBoolean(value);
             }
             else if(node.Type == TypeSymbol.Int){
+                if (value is double d) return (int)d;
                 return Convert.ToInt32(value);
             }
             else if(node.Type == TypeSymbol.String){
                 return Convert.ToString(value);
+            }
+            else if(node.Type == TypeSymbol.Float){
+                return Convert.ToDouble(value);
+            }
+            else if(node.Type == TypeSymbol.Char){
+                if (value is string s && s.Length > 0) return s[0];
+                return Convert.ToChar(value);
             }
             else{
                 throw new Exception($"Unexpected node {node.Type}");
@@ -118,23 +174,48 @@ namespace Kaedehara.CodeAnalysis
 
         private object EvaluateCallExpression(BoundCallExpression node)
         {
-            if(node.Function == BuiltinFunctions.Input){
+            if (node.Function == BuiltinFunctions.Input)
+            {
                 return Console.ReadLine();
             }
-            else if (node.Function == BuiltinFunctions.Print){
-                var message = (string)EvaluateExpression(node.Arguments[0]);
+            else if (node.Function == BuiltinFunctions.Print)
+            {
+                var message = Convert.ToString(EvaluateExpression(node.Arguments[0]));
                 Console.WriteLine(message);
                 return null;
             }
-            else if (node.Function == BuiltinFunctions.Rnd){
+            else if (node.Function == BuiltinFunctions.Rnd)
+            {
                 var max = (int)EvaluateExpression(node.Arguments[0]);
-                if (_random == null){
+                if (_random == null)
+                {
                     _random = new Random();
                 }
                 return _random.Next(max);
             }
-            else {
-                throw new Exception($"Unexpected function {node.Function}");
+            else
+            {
+                var parameterValues = new object[node.Arguments.Length];
+                for (int i = 0; i < node.Arguments.Length; i++)
+                {
+                    parameterValues[i] = EvaluateExpression(node.Arguments[i]);
+                }
+
+                var frame = new Dictionary<VariableSymbol, object>();
+                for (int i = 0; i < node.Arguments.Length; i++)
+                {
+                    frame[node.Function.Parameter[i]] = parameterValues[i];
+                }
+
+                _locals.Push(frame);
+                _currentFunctions.Push(node.Function);
+
+                var result = EvaluateBlock(node.Function.Body);
+
+                _currentFunctions.Pop();
+                _locals.Pop();
+
+                return result;
             }
         }
 
@@ -144,8 +225,12 @@ namespace Kaedehara.CodeAnalysis
             switch (u.Op.Kind)
             {
                 case BoundUnaryOperatorKind.identity:
+                    if (u.Type == TypeSymbol.Float)
+                        return (double)operand;
                     return (int)operand;
                 case BoundUnaryOperatorKind.Negation:
+                    if (u.Type == TypeSymbol.Float)
+                        return -(double)operand;
                     return -(int)operand;
                 case BoundUnaryOperatorKind.LogicalNegation:
                     return !(bool)operand;
@@ -164,15 +249,23 @@ namespace Kaedehara.CodeAnalysis
             switch (b.Op.Kind)
             {
                 case BoundBinaryOperatorKind.Addition:
-                 if (b.Type == TypeSymbol.Int)
+                    if (b.Type == TypeSymbol.Int)
                         return (int)left + (int)right;
+                    else if (b.Type == TypeSymbol.Float)
+                        return (double)left + (double)right;
                     else
                         return (string)left + (string)right;
                 case BoundBinaryOperatorKind.Subtraction:
+                    if (b.Type == TypeSymbol.Float)
+                        return (double)left - (double)right;
                     return (int)left - (int)right;
                 case BoundBinaryOperatorKind.Multiplication:
+                    if (b.Type == TypeSymbol.Float)
+                        return (double)left * (double)right;
                     return (int)left * (int)right;
                 case BoundBinaryOperatorKind.Division:
+                    if (b.Type == TypeSymbol.Float)
+                        return (double)left / (double)right;
                     return (int)left / (int)right;
 
                 case BoundBinaryOperatorKind.BitwiseAnd:
@@ -200,12 +293,28 @@ namespace Kaedehara.CodeAnalysis
                 case BoundBinaryOperatorKind.NotEquals:
                     return !Equals(left, right);
                 case BoundBinaryOperatorKind.LessThan:
+                    if (b.Left.Type == TypeSymbol.Float)
+                        return (double)left < (double)right;
+                    else if (b.Left.Type == TypeSymbol.Char)
+                        return (char)left < (char)right;
                     return (int)left < (int)right;
                 case BoundBinaryOperatorKind.LessThanOrEqualsTo:
+                    if (b.Left.Type == TypeSymbol.Float)
+                        return (double)left <= (double)right;
+                    else if (b.Left.Type == TypeSymbol.Char)
+                        return (char)left <= (char)right;
                     return (int)left <= (int)right;
                 case BoundBinaryOperatorKind.GreaterThan:
+                    if (b.Left.Type == TypeSymbol.Float)
+                        return (double)left > (double)right;
+                    else if (b.Left.Type == TypeSymbol.Char)
+                        return (char)left > (char)right;
                     return (int)left > (int)right;
                 case BoundBinaryOperatorKind.GreaterOrEqualsTo:
+                    if (b.Left.Type == TypeSymbol.Float)
+                        return (double)left >= (double)right;
+                    else if (b.Left.Type == TypeSymbol.Char)
+                        return (char)left >= (char)right;
                     return (int)left >= (int)right;
                 default:
                     throw new Exception($"unexpected binary operator {b.Op.Kind}");
@@ -214,7 +323,14 @@ namespace Kaedehara.CodeAnalysis
         private void EvaluateVariableDeclaration(BoundVariableDeclaration node)
         {
             var value = EvaluateExpression(node.Initializer);
-            _variables[node.Variable] = value;
+            if (_currentFunctions.Count > 0 && _currentFunctions.Peek().Locals.Contains(node.Variable))
+            {
+                _locals.Peek()[node.Variable] = value;
+            }
+            else
+            {
+                _variables[node.Variable] = value;
+            }
             _lastValue = value;
         }
 
@@ -229,12 +345,23 @@ namespace Kaedehara.CodeAnalysis
         }
         private object EvaluateVariableExpression(BoundVariableExpression v)
         {
+            if (_currentFunctions.Count > 0 && _currentFunctions.Peek().Locals.Contains(v.Variable))
+            {
+                return _locals.Peek()[v.Variable];
+            }
             return _variables[v.Variable];
         }
         private object EvaluateAssignmentExpression(BoundAssignmentExpression a)
         {
             var value = EvaluateExpression(a.Expression);
-            _variables[a.Variable] = value;
+            if (_currentFunctions.Count > 0 && _currentFunctions.Peek().Locals.Contains(a.Variable))
+            {
+                _locals.Peek()[a.Variable] = value;
+            }
+            else
+            {
+                _variables[a.Variable] = value;
+            }
             return value;
         }
     }

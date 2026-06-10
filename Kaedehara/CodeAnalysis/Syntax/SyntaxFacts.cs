@@ -92,6 +92,10 @@ namespace Kaedehara.CodeAnalysis.Syntax
                     return SyntaxKind.WhileKeyword;
                 case "to":
                     return SyntaxKind.ToKeyword;
+                case "fn":
+                    return SyntaxKind.FnKeyword;
+                case "return":
+                    return SyntaxKind.ReturnKeyword;
                 default:
                     return SyntaxKind.IdentifierToken;
             }
@@ -164,6 +168,18 @@ namespace Kaedehara.CodeAnalysis.Syntax
                     return "for";
                 case SyntaxKind.ToKeyword:
                     return "to";
+                case SyntaxKind.ColonToken:
+                    return ":";
+                case SyntaxKind.ArrowToken:
+                    return "->";
+                case SyntaxKind.FnKeyword:
+                    return "fn";
+                case SyntaxKind.ReturnKeyword:
+                    return "return";
+                case SyntaxKind.OpenBracketToken:
+                    return "[";
+                case SyntaxKind.CloseBracketToken:
+                    return "]";
                 default:
                     return null;
             }

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaedehara Language Tutorial & Playground</title>
+    <meta name="description" content="Learn the Kaedehara custom compiled language with our interactive tutorial and playground.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-icon">🍁</span>
+                <div class="brand-text">
+                    <h1>Kaedehara</h1>
+                    <span class="sub">Language Guide</span>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-item active" id="nav-welcome" onclick="selectTopic('welcome')">
+                    <span class="nav-number">01</span> Welcome
+                </button>
+                <button class="nav-item" id="nav-variables" onclick="selectTopic('variables')">
+                    <span class="nav-number">02</span> Variables & Constants
+                </button>
+                <button class="nav-item" id="nav-types" onclick="selectTopic('types')">
+                    <span class="nav-number">03</span> Primitive Types
+                </button>
+                <button class="nav-item" id="nav-arrays" onclick="selectTopic('arrays')">
+                    <span class="nav-number">04</span> Arrays & Indexing
+                </button>
+                <button class="nav-item" id="nav-controlflow" onclick="selectTopic('controlflow')">
+                    <span class="nav-number">05</span> Control Flow
+                </button>
+                <button class="nav-item" id="nav-functions" onclick="selectTopic('functions')">
+                    <span class="nav-number">06</span> Functions & Recursion
+                </button>
+                <button class="nav-item playground-btn" id="nav-playground" onclick="selectTopic('playground')">
+                    <span class="nav-number">⚡</span> Code Playground
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <p>Kaedehara Compiler v1.2</p>
+                <p>MSIL backend emitter enabled</p>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <!-- Left Panel: Lesson Content -->
+            <section class="lesson-panel" id="lesson-panel">
+                <div class="lesson-header">
+                    <span class="lesson-badge" id="lesson-badge">Topic 01</span>
+                    <h2 id="lesson-title">Welcome to Kaedehara</h2>
+                </div>
+                <div class="lesson-content" id="lesson-text">
+                    <!-- Dynamic content injected here -->
+                </div>
+                <div class="lesson-example-card" id="lesson-example-card">
+                    <h3>Example Code</h3>
+                    <div class="code-block-wrapper">
+                        <pre><code class="code-display" id="lesson-code-display"></code></pre>
+                    </div>
+                    <button class="action-btn try-btn" id="try-btn" onclick="loadExampleIntoPlayground()">
+                        Try it Yourself &rarr;
+                    </button>
+                </div>
+            </section>
+
+            <!-- Right Panel: Editor and Output -->
+            <section class="editor-panel">
+                <div class="panel-header">
+                    <div class="tabs">
+                        <span class="tab-item active">
+                            <span class="tab-icon">📝</span> main.kdh
+                        </span>
+                    </div>
+                    <div class="actions">
+                        <button class="action-btn run-btn" onclick="runPlayground()">
+                            <span class="run-icon">▶</span> Run Code
+                        </button>
+                        <button class="action-btn reset-btn" onclick="resetPlayground()">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="editor-container">
+                    <div class="line-numbers" id="line-numbers"></div>
+                    <div class="editor-wrapper">
+                        <pre class="highlight-layer" id="highlight-layer"><code id="highlight-code"></code></pre>
+                        <textarea class="code-editor" id="code-editor" spellcheck="false" oninput="onEditorInput()" onscroll="onEditorScroll()"></textarea>
+                    </div>
+                </div>
+
+                <div class="console-container">
+                    <div class="console-header">
+                        <span>Console Output</span>
+                        <button class="clear-console-btn" onclick="clearConsole()">Clear</button>
+                    </div>
+                    <div class="console-body" id="console-body">
+                        <div class="console-line system-msg">Interactive shell active. Type code and click Run.</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>

@@ -99,6 +99,8 @@ public class LexerTest
         {
             (SyntaxKind.NumberToken,"1"),
             (SyntaxKind.NumberToken,"123"),
+            (SyntaxKind.FloatToken,"3.14"),
+            (SyntaxKind.CharToken,"'a'"),
             (SyntaxKind.IdentifierToken,"a"),
             (SyntaxKind.IdentifierToken,"abc"),
             (SyntaxKind.StringToken,"\"Test\""),
@@ -183,6 +185,18 @@ public class LexerTest
         }
         if(t1Kind == SyntaxKind.PipeToken && t2Kind == SyntaxKind.PipePipeToken){
             return true ;
+        }
+        if (t1Kind == SyntaxKind.MinusToken && (t2Kind == SyntaxKind.GreatToken || t2Kind == SyntaxKind.GreaterOrEqualsToken || t2Kind == SyntaxKind.ArrowToken))
+        {
+            return true;
+        }
+        if (t1Kind == SyntaxKind.FloatToken && (t2Kind == SyntaxKind.FloatToken || t2Kind == SyntaxKind.NumberToken || t2Kind == SyntaxKind.IdentifierToken || t2IsKeyword))
+        {
+            return true;
+        }
+        if (t2Kind == SyntaxKind.FloatToken && (t1Kind == SyntaxKind.FloatToken || t1Kind == SyntaxKind.NumberToken || t1Kind == SyntaxKind.IdentifierToken || t1IsKeyword))
+        {
+            return true;
         }
 
         return false ;

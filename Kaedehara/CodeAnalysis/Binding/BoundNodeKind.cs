@@ -18,7 +18,12 @@ internal enum BoundNodeKind
     ConditionalGoToStatement,
     ErrorExpression,
     CallExpression,
-    ConversionExpression
+    ConversionExpression,
+    FunctionDeclaration,
+    ReturnStatement,
+    ArrayLiteralExpression,
+    ArrayAccessExpression,
+    ArrayAssignmentExpression
 }
 
 

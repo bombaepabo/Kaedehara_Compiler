@@ -128,7 +128,12 @@ namespace Kaedehara.CodeAnalysis.Lowering
 
         }
 
-
-
+        protected override BoundStatement RewriteFunctionDeclaration(BoundFunctionDeclaration node)
+        {
+            var rewrittenBody = RewriteStatement(node.Body);
+            var flattenedBody = Flatten(rewrittenBody);
+            node.Function.Body = flattenedBody;
+            return new BoundFunctionDeclaration(node.Function, flattenedBody);
+        }
     }
 }

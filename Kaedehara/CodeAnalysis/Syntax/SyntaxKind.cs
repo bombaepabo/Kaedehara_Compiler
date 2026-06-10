@@ -55,7 +55,20 @@ namespace Kaedehara.CodeAnalysis.Syntax
         StringToken,
         CallExpression,
         CommaToken,
-
+        FloatToken,
+        CharToken,
+        ColonToken,
+        ArrowToken,
+        FnKeyword,
+        ReturnKeyword,
+        OpenBracketToken,
+        CloseBracketToken,
+        FunctionDeclaration,
+        Parameter,
+        ReturnStatement,
+        TypeClause,
+        ArrayLiteralExpression,
+        ArrayAccessExpression,
     }
 
 

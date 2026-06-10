@@ -1,12 +1,15 @@
 using System.Collections.Immutable;
 using Kaedehara.CodeAnalysis.Binding;
 using Kaedehara.CodeAnalysis.Syntax;
+
 using System.Threading;
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using Kaedehara.CodeAnalysis.Lowering;
 using Kaedehara.CodeAnalysis.Symbols;
+
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Kaedehara.Tests")]
 
 namespace Kaedehara.CodeAnalysis
 {
@@ -51,8 +54,8 @@ namespace Kaedehara.CodeAnalysis
                 return new EvaluationResult(diagnostics, null);
             }
             var statement = GetStatement();
-            var evaluator = new Evaluator(statement, variables);
-            var value = evaluator.Evaluate();
+
+            var value = Emit.Emitter.EmitAndExecute(statement, variables);
             return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, value);
         }
 

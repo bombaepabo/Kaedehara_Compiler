@@ -46,8 +46,16 @@ namespace Kaedehara.CodeAnalysis.Syntax
                     _position++;
                     break;
                 case '-':
-                    _kind = SyntaxKind.MinusToken;
                     _position++;
+                    if (Current == '>')
+                    {
+                        _kind = SyntaxKind.ArrowToken;
+                        _position++;
+                    }
+                    else
+                    {
+                        _kind = SyntaxKind.MinusToken;
+                    }
                     break;
                 case '*':
                     _kind = SyntaxKind.StarToken;
@@ -76,6 +84,21 @@ namespace Kaedehara.CodeAnalysis.Syntax
                 case ',':
                     _kind = SyntaxKind.CommaToken;
                     _position++;
+                    break;
+                case ':':
+                    _kind = SyntaxKind.ColonToken;
+                    _position++;
+                    break;
+                case '[':
+                    _kind = SyntaxKind.OpenBracketToken;
+                    _position++;
+                    break;
+                case ']':
+                    _kind = SyntaxKind.CloseBracketToken;
+                    _position++;
+                    break;
+                case '\'':
+                    ReadCharToken();
                     break;
                 case '~':
                     _kind = SyntaxKind.TildeToken;
@@ -283,14 +306,66 @@ namespace Kaedehara.CodeAnalysis.Syntax
             while (char.IsDigit(Current))
             {
                 _position++;
-
             }
+            
+            var isFloat = false;
+            if (Current == '.' && char.IsDigit(Lookahead))
+            {
+                isFloat = true;
+                _position++; // skip '.'
+                while (char.IsDigit(Current))
+                {
+                    _position++;
+                }
+            }
+
             var length = _position - _start;
             var text = _text.ToString(_start, length);
-            if (!int.TryParse(text, out var value))
-                _diagnostics.ReportInvalidNumber(new TextSpan(_start, length), text, TypeSymbol.Int);
+            if (isFloat)
+            {
+                if (!double.TryParse(text, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var value))
+                    _diagnostics.ReportInvalidNumber(new TextSpan(_start, length), text, TypeSymbol.Float);
+                _value = value;
+                _kind = SyntaxKind.FloatToken;
+            }
+            else
+            {
+                if (!int.TryParse(text, out var value))
+                    _diagnostics.ReportInvalidNumber(new TextSpan(_start, length), text, TypeSymbol.Int);
+                _value = value;
+                _kind = SyntaxKind.NumberToken;
+            }
+        }
+
+        private void ReadCharToken()
+        {
+            // Skip the current quote '\''
+            _position++;
+
+            if (Current == '\0')
+            {
+                _diagnostics.ReportUnterminatedChar(new TextSpan(_start, 1));
+                _kind = SyntaxKind.CharToken;
+                _value = '\0';
+                return;
+            }
+
+            var value = Current;
+            _position++;
+
+            if (Current != '\'')
+            {
+                _diagnostics.ReportUnterminatedChar(new TextSpan(_start, _position - _start));
+                _kind = SyntaxKind.CharToken;
+                _value = value;
+                return;
+            }
+
+            // Skip closing quote
+            _position++;
+
+            _kind = SyntaxKind.CharToken;
             _value = value;
-            _kind = SyntaxKind.NumberToken;
         }
     }
 

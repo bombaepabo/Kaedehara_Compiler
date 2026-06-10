@@ -21,6 +21,14 @@ namespace Kaedehara.CodeAnalysis.Binding
             {
                 Type = TypeSymbol.String;
             }
+            else if (value is double)
+            {
+                Type = TypeSymbol.Float;
+            }
+            else if (value is char)
+            {
+                Type = TypeSymbol.Char;
+            }
             else
             {
                 throw new Exception($"Unexpected literal '{value}' of type {value.GetType()}");

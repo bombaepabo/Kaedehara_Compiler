@@ -1,5 +1,6 @@
 using System.Numerics;
 using Kaedehara.CodeAnalysis;
+using Kaedehara.CodeAnalysis.Binding;
 using Kaedehara.CodeAnalysis.Symbols;
 using Kaedehara.CodeAnalysis.Syntax;
 using NuGet.Frameworks;
@@ -80,7 +81,31 @@ public class EvaluatorTests
     [InlineData("{var result = 0 for i = 0 to 10 { result = result + i } result }", 55)]
     [InlineData("{var a = 10 for i =1 to (a = a - 1) {} a}",9)]
 
-
+    [InlineData("2.5 + 3.0", 5.5)]
+    [InlineData("5.5 - 1.5", 4.0)]
+    [InlineData("2.0 * 3.5", 7.0)]
+    [InlineData("9.0 / 2.0", 4.5)]
+    [InlineData("-3.5", -3.5)]
+    [InlineData("+3.5", 3.5)]
+    [InlineData("2 + 3.5", 5.5)]
+    [InlineData("3.5 + 2", 5.5)]
+    [InlineData("5 * 2.0", 10.0)]
+    [InlineData("9 / 2.0", 4.5)]
+    [InlineData("3.5 < 4.0", true)]
+    [InlineData("3.5 >= 3.5", true)]
+    [InlineData("3.5 == 3.5", true)]
+    [InlineData("3.5 != 2.0", true)]
+    [InlineData("'a'", 'a')]
+    [InlineData("'a' == 'a'", true)]
+    [InlineData("'a' != 'b'", true)]
+    [InlineData("'a' < 'b'", true)]
+    [InlineData("'c' >= 'b'", true)]
+    [InlineData("string(3.5)", "3.5")]
+    [InlineData("float(10)", 10.0)]
+    [InlineData("int(3.5)", 3)]
+    [InlineData("char(\"abc\")", 'a')]
+    [InlineData("int('a')", 97)]
+    [InlineData("char(97)", 'a')]
 
     public void Evaluator_Computes_CorrectValues(string text, object expectedValue)
     {
@@ -314,4 +339,276 @@ public class EvaluatorTests
         }
     }
 
+    [Theory]
+    [InlineData("1 + 2", 3)]
+    [InlineData("3 * 4 + 2", 14)]
+    [InlineData("true && false", false)]
+    [InlineData("string(3.5)", "3.5")]
+    [InlineData("int(5.5)", 5)]
+    [InlineData("1.25 + 2.25", 3.5)]
+    [InlineData("'a'", 'a')]
+    public void Evaluator_ConstantFolding_Folds_Expressions(string text, object expectedValue)
+    {
+        var syntaxTree = SyntaxTree.Parse(text);
+        var compilation = new Compilation(syntaxTree);
+        var statement = compilation.GlobalScope.Statement;
+        var exprStatement = Assert.IsType<BoundExpressionStatement>(statement);
+        var literalExpr = Assert.IsType<BoundLiteralExpression>(exprStatement.Expression);
+        Assert.Equal(expectedValue, literalExpr.Value);
+    }
+
+    [Fact]
+    public void Evaluator_Functions_Evaluate_Correctly()
+    {
+        AssertValue(@"
+        {
+            fn add(x: int, y: int) -> int {
+                return x + y
+            }
+            add(5, 10)
+        }
+        ", 15);
+    }
+
+    [Fact]
+    public void Evaluator_Functions_TypePromotion()
+    {
+        AssertValue(@"
+        {
+            fn add(x: float, y: float) -> float {
+                return x + y
+            }
+            add(5, 10.5)
+        }
+        ", 15.5);
+    }
+
+    [Fact]
+    public void Evaluator_Functions_Scoping()
+    {
+        AssertValue(@"
+        {
+            var x = 10
+            fn foo(x: int) -> int {
+                return x * 2
+            }
+            foo(5) + x
+        }
+        ", 20);
+    }
+
+    [Fact]
+    public void Evaluator_Functions_Recursion()
+    {
+        AssertValue(@"
+        {
+            fn fib(n: int) -> int {
+                if n < 2 {
+                    return n
+                }
+                return fib(n - 1) + fib(n - 2)
+            }
+            fib(6)
+        }
+        ", 8);
+    }
+
+    [Fact]
+    public void Evaluator_Functions_VoidReturn()
+    {
+        AssertValue(@"
+        {
+            var x = 0
+            fn setX(val: int) {
+                x = val
+            }
+            setX(10)
+            x
+        }
+        ", 10);
+    }
+
+    [Fact]
+    public void Evaluator_Functions_Report_UndefinedType()
+    {
+        var text = @"
+        {
+            fn add(x: [badtype]) {}
+        }
+        ";
+        var diagnostics = @"
+            Type 'badtype' doesn't exist.
+        ";
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void Evaluator_Functions_Report_InvalidReturnType()
+    {
+        var text = @"
+        {
+            fn add(x: int) -> int {
+                return [false]
+            }
+        }
+        ";
+        var diagnostics = @"
+            Function return type is 'int' but return statement expression type is 'bool'.
+        ";
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void Evaluator_Functions_Report_AllPathsMustReturn()
+    {
+        var text = @"
+        {
+            fn [add](x: int) -> int {
+                if x > 0 {
+                    return 1
+                }
+            }
+        }
+        ";
+        var diagnostics = @"
+            Not all code paths return a value.
+        ";
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void Evaluator_Functions_Report_InvalidReturnStatement()
+    {
+        var text = @"
+        [return] 10
+        ";
+        var diagnostics = @"
+            The 'return' keyword can only be used inside a function.
+        ";
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void Evaluator_Functions_Report_DuplicateDeclaration()
+    {
+        var text = @"
+        {
+            fn foo() {}
+            fn [foo]() {}
+        }
+        ";
+        var diagnostics = @"
+            Function 'foo' is already declared.
+        ";
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void Evaluator_Arrays_CanDeclareAndAccess()
+    {
+        var text = @"
+        {
+            let arr = [1, 2, 3]
+            arr[0] + arr[1] + arr[2]
+        }
+        ";
+        AssertValue(text, 6);
+    }
+
+    [Fact]
+    public void Evaluator_Arrays_CanMutate()
+    {
+        var text = @"
+        {
+            let arr = [1, 2, 3]
+            arr[1] = 20
+            arr[0] + arr[1] + arr[2]
+        }
+        ";
+        AssertValue(text, 24);
+    }
+
+    [Fact]
+    public void Evaluator_Arrays_WithExplicitTypeClause()
+    {
+        var text = @"
+        {
+            let arr: int[] = [1, 2, 3]
+            arr[0]
+        }
+        ";
+        AssertValue(text, 1);
+    }
+
+    [Fact]
+    public void Evaluator_Arrays_PromoteElementTypes()
+    {
+        var text = @"
+        {
+            let arr = [1, 2.5]
+            arr[0] + arr[1]
+        }
+        ";
+        AssertValue(text, 3.5);
+    }
+
+    [Fact]
+    public void Evaluator_Arrays_Report_CannotIndex()
+    {
+        var text = @"
+        {
+            let x = 10
+            x[0]
+        }
+        ";
+        var diagnostics = @"
+            Cannot index into a value of type 'int'.
+        ";
+        AssertArrayDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void Evaluator_Arrays_Report_IndexMustBeInt()
+    {
+        var text = @"
+        {
+            let arr = [1, 2]
+            arr[true]
+        }
+        ";
+        var diagnostics = @"
+            Index must be an integer, but was 'bool'.
+        ";
+        AssertArrayDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void Evaluator_Arrays_Report_CannotConvertType()
+    {
+        var text = @"
+        {
+            let arr: int[] = [true]
+        }
+        ";
+        var diagnostics = @"
+            Cannot convert type 'bool[]' to 'int[]'.
+        ";
+        AssertArrayDiagnostics(text, diagnostics);
+    }
+
+    private static void AssertArrayDiagnostics(string text, string expectedDiagnosticText)
+    {
+        var syntaxTree = SyntaxTree.Parse(text);
+        var compilation = new Compilation(syntaxTree);
+        var result = compilation.Evaluate(new Dictionary<VariableSymbol, object>());
+
+        var expectedDiagnostics = AnnotatedText.UnindentLines(expectedDiagnosticText);
+        Assert.Equal(expectedDiagnostics.Length, result.Diagnostics.Length);
+        for (var i = 0; i < expectedDiagnostics.Length; i++)
+        {
+            var expectedMessage = expectedDiagnostics[i];
+            var actualMessage = result.Diagnostics[i].Message;
+            Assert.Equal(expectedMessage, actualMessage);
+        }
+    }
 }

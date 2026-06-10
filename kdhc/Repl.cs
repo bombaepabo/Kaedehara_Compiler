@@ -10,6 +10,11 @@ namespace kdhc
         private List<string> _submissionHistory = new();
         private int _submissionHistoryIndex;
         private bool _done;
+
+        private string? _completionPrefix;
+        private List<string>? _completionMatches;
+        private int _completionIndex;
+        private int _completionWordStart;
         public void Run()
         {
 
@@ -39,7 +44,7 @@ namespace kdhc
         {
             private readonly Action<string> _lineRenderer;
             private readonly ObservableCollection<string> _submissionDocument;
-            private readonly int _cursorTop;
+            private int _cursorTop;
             private int _renderedLineCount;
             private int currentLine;
             private int currentCharacter;
@@ -64,7 +69,15 @@ namespace kdhc
                 var lineCount = 0;
                 foreach (var line in _submissionDocument)
                 {
-                    Console.SetCursorPosition(0, _cursorTop + lineCount);
+                    if (_cursorTop + lineCount >= Console.BufferHeight)
+                    {
+                        Console.SetCursorPosition(0, Console.BufferHeight - 1);
+                        Console.WriteLine();
+                        _cursorTop--;
+                    }
+                    var y = _cursorTop + lineCount;
+                    if (y < 0) y = 0;
+                    Console.SetCursorPosition(0, y);
                     Console.ForegroundColor = ConsoleColor.Green;
                     if (lineCount == 0)
                     {
@@ -76,18 +89,32 @@ namespace kdhc
                     }
                     Console.ResetColor();
                     _lineRenderer(line);
-                    Console.WriteLine(new string(' ', Console.WindowWidth - line.Length));
+                    
+                    var remaining = Console.WindowWidth - line.Length - 2 - 1;
+                    if (remaining > 0)
+                    {
+                        Console.Write(new string(' ', remaining));
+                    }
+                    Console.WriteLine();
+                    if (_cursorTop + lineCount == Console.BufferHeight - 1)
+                    {
+                        _cursorTop--;
+                    }
                     lineCount++;
                 }
 
                 var numberOfBlankLines = _renderedLineCount - lineCount;
                 if (numberOfBlankLines > 0)
                 {
-                    var blankLine = new string(' ', Console.WindowWidth);
-                   for(var i =  0; i < numberOfBlankLines ; i++)
+                    var blankLine = new string(' ', Console.WindowWidth - 1);
+                    for(var i =  0; i < numberOfBlankLines ; i++)
                     {
-                        Console.SetCursorPosition(0, _cursorTop + lineCount + i);
-                        Console.WriteLine(blankLine);
+                        var y = _cursorTop + lineCount + i;
+                        if (y >= 0 && y < Console.BufferHeight)
+                        {
+                            Console.SetCursorPosition(0, y);
+                            Console.Write(blankLine);
+                        }
                     }
 
                 }
@@ -99,7 +126,10 @@ namespace kdhc
 
             private void UpdateCursorPosition()
             {
-                Console.CursorTop = _cursorTop + currentLine;
+                var top = _cursorTop + currentLine;
+                if (top < 0) top = 0;
+                if (top >= Console.BufferHeight) top = Console.BufferHeight - 1;
+                Console.CursorTop = top;
                 Console.CursorLeft = 2 + currentCharacter;
             }
 
@@ -149,6 +179,11 @@ namespace kdhc
 
         private void HandleKey(ConsoleKeyInfo key, ObservableCollection<string> document, SubmissionView view)
         {
+            if (key.Key != ConsoleKey.Tab)
+            {
+                _completionMatches = null;
+            }
+
             if (key.Modifiers == default(ConsoleModifiers))
             {
                 switch (key.Key)
@@ -254,12 +289,42 @@ namespace kdhc
 
         private void HandleTab(ObservableCollection<string> document, SubmissionView view)
         {
-            const int tabWidth = 4 ;
-            var start = view.CurrentCharacter ;
-            var remainingSpaces = tabWidth - start % tabWidth ;
             var line = document[view.CurrentLine];
-            document[view.CurrentLine] = line.Insert(start, new string(' ',remainingSpaces));
-            view.CurrentCharacter += remainingSpaces;
+            var start = view.CurrentCharacter;
+
+            var wordStart = start;
+            while (wordStart > 0 && (char.IsLetterOrDigit(line[wordStart - 1]) || line[wordStart - 1] == '_'))
+            {
+                wordStart--;
+            }
+
+            var prefix = line.Substring(wordStart, start - wordStart);
+
+            if (_completionMatches == null || _completionWordStart != wordStart)
+            {
+                _completionPrefix = prefix;
+                _completionMatches = GetCompletions(prefix).ToList();
+                _completionIndex = 0;
+                _completionWordStart = wordStart;
+            }
+
+            if (_completionMatches.Count == 0)
+            {
+                const int tabWidth = 4;
+                var remainingSpaces = tabWidth - start % tabWidth;
+                document[view.CurrentLine] = line.Insert(start, new string(' ', remainingSpaces));
+                view.CurrentCharacter += remainingSpaces;
+                _completionMatches = null;
+                return;
+            }
+
+            var match = _completionMatches[_completionIndex];
+            _completionIndex = (_completionIndex + 1) % _completionMatches.Count;
+
+            var before = line.Substring(0, wordStart);
+            var after = line.Substring(start);
+            document[view.CurrentLine] = before + match + after;
+            view.CurrentCharacter = wordStart + match.Length;
         }
 
         private void HandleEnd(ObservableCollection<string> document, SubmissionView view)
@@ -399,6 +464,11 @@ namespace kdhc
             Console.WriteLine($"Invalid command {input}");
             Console.ResetColor();
 
+        }
+
+        protected virtual IEnumerable<string> GetCompletions(string prefix)
+        {
+            return Enumerable.Empty<string>();
         }
 
         protected abstract bool isCompleteSubmission(string text);

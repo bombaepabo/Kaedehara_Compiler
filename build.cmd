@@ -1,3 +1,3 @@
 @echo off
-dotnet build
-dotnet test .\Kaedehara.Tests\Kaedehara.Tests.csproj
+dotnet build --ignore-failed-sources
+dotnet test .\Kaedehara.Tests\Kaedehara.Tests.csproj --no-restore --no-build

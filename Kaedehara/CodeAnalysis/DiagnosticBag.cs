@@ -80,15 +80,45 @@ namespace Kaedehara.CodeAnalysis
             Report(span, message);
         }
 
+        internal void ReportCannotAssign(TextSpan span)
+        {
+            var message = "The left-hand side of an assignment must be a variable or an array element.";
+            Report(span, message);
+        }
+
+        internal void ReportCannotIndex(TextSpan span, TypeSymbol type)
+        {
+            var message = $"Cannot index into a value of type '{type}'.";
+            Report(span, message);
+        }
+
+        internal void ReportIndexMustBeInt(TextSpan span, TypeSymbol type)
+        {
+            var message = $"Index must be an integer, but was '{type}'.";
+            Report(span, message);
+        }
+
         public void ReportUnterminatedString(TextSpan span)
         {
             var message = "Unterminated string literal.";
             Report(span, message);
         }
 
+        public void ReportUnterminatedChar(TextSpan span)
+        {
+            var message = "Unterminated character literal.";
+            Report(span, message);
+        }
+
         public void ReportUndefinedFunction(TextSpan span, string text)
         {
              var message = $"Function '{text}' doesn't exist.";
+            Report(span, message);
+        }
+
+        internal void ReportUndefinedType(TextSpan span, string name)
+        {
+            var message = $"Type '{name}' doesn't exist.";
             Report(span, message);
         }
 
@@ -107,6 +137,30 @@ namespace Kaedehara.CodeAnalysis
         public void ReportExpressionMustHaveValue(TextSpan span)
         {
           var message = $"Expression must have a value.";
+            Report(span, message);
+        }
+
+        internal void ReportFunctionAlreadyDeclared(TextSpan span, string name)
+        {
+            var message = $"Function '{name}' is already declared.";
+            Report(span, message);
+        }
+
+        internal void ReportInvalidReturnType(TextSpan span, TypeSymbol expectedType, TypeSymbol actualType)
+        {
+            var message = $"Function return type is '{expectedType}' but return statement expression type is '{actualType}'.";
+            Report(span, message);
+        }
+
+        internal void ReportAllPathsMustReturn(TextSpan span)
+        {
+            var message = $"Not all code paths return a value.";
+            Report(span, message);
+        }
+
+        internal void ReportInvalidReturnStatement(TextSpan span)
+        {
+            var message = $"The 'return' keyword can only be used inside a function.";
             Report(span, message);
         }
     }

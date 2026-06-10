@@ -60,6 +60,24 @@ internal sealed class BoundBinaryOperator
             
             new BoundBinaryOperator(SyntaxKind.PlusToken,BoundBinaryOperatorKind.Addition,TypeSymbol.String),
 
+            new BoundBinaryOperator(SyntaxKind.PlusToken,BoundBinaryOperatorKind.Addition,TypeSymbol.Float),
+            new BoundBinaryOperator(SyntaxKind.MinusToken,BoundBinaryOperatorKind.Subtraction,TypeSymbol.Float),
+            new BoundBinaryOperator(SyntaxKind.StarToken,BoundBinaryOperatorKind.Multiplication,TypeSymbol.Float),
+            new BoundBinaryOperator(SyntaxKind.SlashToken,BoundBinaryOperatorKind.Division,TypeSymbol.Float),
+            new BoundBinaryOperator(SyntaxKind.EqualEqualToken,BoundBinaryOperatorKind.Equals,TypeSymbol.Float,TypeSymbol.Bool),
+            new BoundBinaryOperator(SyntaxKind.NotEqualToken,BoundBinaryOperatorKind.NotEquals,TypeSymbol.Float,TypeSymbol.Bool),
+            new BoundBinaryOperator(SyntaxKind.LessToken,BoundBinaryOperatorKind.LessThan,TypeSymbol.Float,TypeSymbol.Bool),
+            new BoundBinaryOperator(SyntaxKind.LessOrEqualsToken,BoundBinaryOperatorKind.LessThanOrEqualsTo,TypeSymbol.Float,TypeSymbol.Bool),
+            new BoundBinaryOperator(SyntaxKind.GreatToken,BoundBinaryOperatorKind.GreaterThan,TypeSymbol.Float,TypeSymbol.Bool),
+            new BoundBinaryOperator(SyntaxKind.GreaterOrEqualsToken,BoundBinaryOperatorKind.GreaterOrEqualsTo,TypeSymbol.Float,TypeSymbol.Bool),
+
+            new BoundBinaryOperator(SyntaxKind.EqualEqualToken,BoundBinaryOperatorKind.Equals,TypeSymbol.Char,TypeSymbol.Bool),
+            new BoundBinaryOperator(SyntaxKind.NotEqualToken,BoundBinaryOperatorKind.NotEquals,TypeSymbol.Char,TypeSymbol.Bool),
+            new BoundBinaryOperator(SyntaxKind.LessToken,BoundBinaryOperatorKind.LessThan,TypeSymbol.Char,TypeSymbol.Bool),
+            new BoundBinaryOperator(SyntaxKind.LessOrEqualsToken,BoundBinaryOperatorKind.LessThanOrEqualsTo,TypeSymbol.Char,TypeSymbol.Bool),
+            new BoundBinaryOperator(SyntaxKind.GreatToken,BoundBinaryOperatorKind.GreaterThan,TypeSymbol.Char,TypeSymbol.Bool),
+            new BoundBinaryOperator(SyntaxKind.GreaterOrEqualsToken,BoundBinaryOperatorKind.GreaterOrEqualsTo,TypeSymbol.Char,TypeSymbol.Bool),
+
 
 
         };

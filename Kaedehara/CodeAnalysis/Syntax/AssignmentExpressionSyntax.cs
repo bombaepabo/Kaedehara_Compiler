@@ -1,21 +1,18 @@
-using Kaedehara.CodeAnalysis.Syntax;
-
 namespace Kaedehara.CodeAnalysis.Syntax
 {
     public sealed class AssignmentExpressionSyntax : ExpressionSyntax
     {
-        public AssignmentExpressionSyntax(SyntaxToken identifierToken, SyntaxToken equalToken, ExpressionSyntax expression)
+        public AssignmentExpressionSyntax(ExpressionSyntax left, SyntaxToken equalsToken, ExpressionSyntax expression)
         {
-            IdentifierToken = identifierToken;
-            EqualsToken = equalToken;
+            Left = left;
+            EqualsToken = equalsToken;
             Expression = expression;
         }
 
-        public SyntaxToken IdentifierToken { get; }
+        public ExpressionSyntax Left { get; }
         public SyntaxToken EqualsToken { get; }
         public ExpressionSyntax Expression { get; }
 
         public override SyntaxKind Kind => SyntaxKind.AssignmentExpression;
-
     }
 }
